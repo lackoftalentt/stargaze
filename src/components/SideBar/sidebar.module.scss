@@ -1,0 +1,16 @@
+.sidebar {
+	height: 100vh;
+	.sidebarHeader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 80px;
+		.sidebarLogo {
+			width: 250px;
+			height: 80px;
+		}
+	}
+	.menu {
+		margin-top: 20px;
+	}
+}
