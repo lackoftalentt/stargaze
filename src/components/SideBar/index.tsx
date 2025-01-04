@@ -1,11 +1,7 @@
-import {
-	UploadOutlined,
-	UserOutlined,
-	VideoCameraOutlined,
-} from '@ant-design/icons';
+import { CheckOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu } from 'antd';
 import st from './sidebar.module.scss';
-import logo from '/src/assets/images/logo.webp';
+import logo from '/src/assets/images/logo.png';
 const { Sider } = Layout;
 
 export const SideBar = () => {
@@ -28,14 +24,14 @@ export const SideBar = () => {
 				mode='inline'
 				defaultSelectedKeys={['1']}
 			>
-				<Menu.Item key='1' icon={<UserOutlined />} danger>
-					nav 1
+				<Menu.Item key='1' icon={<HomeOutlined />}>
+					Home
 				</Menu.Item>
-				<Menu.Item key='2' icon={<VideoCameraOutlined />} danger>
-					nav 2
+				<Menu.Item key='2' icon={<CheckOutlined />}>
+					Completed
 				</Menu.Item>
-				<Menu.Item key='3' icon={<UploadOutlined />} danger>
-					nav 3
+				<Menu.Item key='3' icon={<UserOutlined />}>
+					Profile
 				</Menu.Item>
 			</Menu>
 		</Sider>

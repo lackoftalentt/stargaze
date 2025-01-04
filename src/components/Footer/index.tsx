@@ -4,7 +4,7 @@ const { Footer } = Layout;
 
 export const FooterComponent = () => {
 	return (
-		<Footer style={{ textAlign: 'center' }}>
+		<Footer style={{ textAlign: 'center', background: 'hsl(218deg 50% 91%)' }}>
 			<footer className={`${st.footer}`}>
 				<ul className={`${st.footer__content}`}>
 					<li className={st.footer__items}>
