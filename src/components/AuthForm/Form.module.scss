@@ -1,10 +1,10 @@
 .form {
 	width: 400px;
-	padding: 20px 20px;
+	padding: 30px 20px;
 	background: hsl(213deg 85% 97%);
 	border-radius: 20px;
 	&__logo {
-		width: 370px;
+		width: 350px;
 	}
 	&__title {
 		font-size: 36px;
@@ -19,15 +19,17 @@
 	}
 	&__input {
 		width: 300px;
+		font-family: "Poppins", serif;
+	}
+	&__input::placeholder{
+		font-family: "Poppins", serif;
 	}
 	&__header{
 		display: flex;
 		justify-content: center;
 		height: 150px;
 	}
-	&__input:focus {
-		border: none;
-	}
+	
 	&__container {
 		display: flex;
 		flex-direction: column;
@@ -63,6 +65,7 @@
 	.inputWrapper {
 		display: flex;
 		gap: 5px;
+		width: 333px;
 		div input{
 			padding: 10px 0;
 		}

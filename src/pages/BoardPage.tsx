@@ -1,7 +1,6 @@
-import React from 'react'
+import authStore from '../stores/auth-store';
 
 export const BoardPage = () => {
-	return (
-		<div>Board</div>
-	)
-}
+	const userName = authStore.user?.userName
+	return <div>{userName}</div>;
+};
