@@ -1,11 +1,26 @@
-import { LockOutlined, MailOutlined, XOutlined } from '@ant-design/icons';
+import {
+	HighlightOutlined,
+	LockOutlined,
+	LoginOutlined,
+	MailOutlined,
+	XOutlined,
+} from '@ant-design/icons';
+import { FirebaseError } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import authStore from '../../stores/auth-store';
-import st from './Form.module.scss';
+import authStore from '../../stores/userStore';
+import { Button } from '../ui/button/button';
+import st from './forms.module.scss';
 import { IForm } from './RegisterForm';
 import logo from '/src/assets/images/logo-black.png';
+
+interface IFireBaseError {
+	email: string;
+	userName: string;
+	password: string;
+}
 
 export const LoginForm = () => {
 	const navigate = useNavigate();
@@ -15,6 +30,13 @@ export const LoginForm = () => {
 			mode: 'onChange',
 		}
 	);
+
+	const [firebaseError, setFirebaseError] = useState<IFireBaseError>({
+		email: '',
+		userName: '',
+		password: '',
+	});
+
 	const email = watch('email');
 	const password = watch('password');
 
@@ -41,13 +63,62 @@ export const LoginForm = () => {
 
 			navigate('/');
 		} catch (error) {
-			console.error;
+			if (error instanceof FirebaseError) {
+				switch (error.code) {
+					case 'auth/email-already-in-use':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Email is already in use.',
+						}));
+						break;
+					case 'auth/invalid-email':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Invalid email address.',
+						}));
+						break;
+					case 'auth/weak-password':
+						setFirebaseError(prev => ({
+							...prev,
+							password: 'Password is too weak.',
+						}));
+						break;
+					case 'auth/operation-not-allowed':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Operation not allowed.',
+						}));
+						break;
+					case 'auth/network-request-failed':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Network error, please try again.',
+						}));
+						break;
+					case 'auth/invalid-credential':
+						setFirebaseError(prev => ({
+							...prev,
+							password: 'Network error, please try again.',
+						}));
+						break;
+						case 'auth/too-many-requests':
+						setFirebaseError(prev => ({
+							...prev,
+							password: 'Network error, please try again.',
+						}));
+						break;
+					default:
+						console.error('An unexpected error occurred:', error.message);
+				}
+			}
 		}
 	};
 	return (
 		<>
-			<div>
-				<p>morninginheaven..</p>
+			<div className={st.wrapperForm}>
+				<p className={st.formTitle}>
+					morninginheaven <HighlightOutlined />{' '}
+				</p>
 				<form onSubmit={handleSubmit(onSubmit)} className={st.form}>
 					<div className={st.form__header}>
 						<img className={st.form__logo} src={logo} alt='' />
@@ -55,10 +126,12 @@ export const LoginForm = () => {
 					<div className={st.form__container}>
 						<div className={st.emailBlock}>
 							<label>
-								{emailError ? (
-									<p style={{ color: 'tomato' }}>{emailError}</p>
+								{emailError || firebaseError.email ? (
+									<span style={{ color: 'tomato' }}>
+										{emailError || firebaseError.email}
+									</span>
 								) : (
-									'Email Adress'
+									'Email Address'
 								)}
 							</label>
 							<div className={st.inputWrapper}>
@@ -80,10 +153,12 @@ export const LoginForm = () => {
 						</div>
 						<div className={st.passwordBlock}>
 							<label>
-								{passwordError ? (
-									<p style={{ color: 'tomato' }}>{passwordError}</p>
+								{passwordError || firebaseError.password ? (
+									<span style={{ color: 'tomato' }}>
+										{passwordError || firebaseError.password}
+									</span>
 								) : (
-									'Passwords'
+									'Password'
 								)}
 							</label>
 							<div className={st.inputWrapper}>
@@ -100,15 +175,18 @@ export const LoginForm = () => {
 										},
 									})}
 								/>
+								{password && (
+									<XOutlined onClick={() => setValue('password', '')} />
+								)}
 							</div>
 						</div>
 						<div>
-							<button
+							<Button
 								className={st.button}
 								onClick={() => handleSubmit(onSubmit)}
 							>
-								Login
-							</button>
+								Login <LoginOutlined/>
+							</Button>
 							<p className={st.link}>
 								Don't have an account? <Link to='/register'>Sign up</Link>
 							</p>

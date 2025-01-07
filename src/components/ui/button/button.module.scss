@@ -1,0 +1,13 @@
+.button {
+	padding: 1em;
+	background: hsl(233deg 36% 38%);
+	color: hsl(0 0 100);
+	border: none;
+	border-radius: 30px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all .3s;
+	&:hover {
+		background: hsl(233, 60%, 44%);
+	}
+}

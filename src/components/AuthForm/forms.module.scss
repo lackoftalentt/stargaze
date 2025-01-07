@@ -1,0 +1,88 @@
+.wrapperForm {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	.formTitle {
+		text-align: center;
+		margin: 10px 0;
+	}
+	.form {
+		width: 400px;
+		padding: 15px 20px 30px;
+		background: hsl(213deg 85% 97%);
+		border-radius: 20px;
+		&__logo {
+			width: 350px;
+		}
+		&__title {
+			font-size: 36px;
+			font-weight: 600;
+			color: black;
+			text-align: left;
+			margin-bottom: 5px;
+		}
+		&__desc {
+			color: black;
+			opacity: 80%;
+		}
+		&__header {
+			display: flex;
+			justify-content: center;
+			height: 150px;
+		}
+		&__input {
+			width: 80%;
+			font-family: 'Poppins', serif;
+		}
+
+		&__container {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			.emailBlock,
+			.userNameBlock {
+				margin-bottom: 50px;
+			}
+			.emailBlock,
+			.passwordBlock,
+			.userNameBlock {
+				background: hsl(0deg 0% 100%);
+				box-shadow: 0 0 2em hsl(231deg 62% 94%);
+				padding: 1em;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5em;
+				border-radius: 20px;
+				color: hsl(0deg 0% 30%);
+				margin-top: -3em;
+				input {
+					outline: none;
+					border: none;
+					&::placeholder {
+						color: hsl(0deg 0% 0%);
+						font-size: 0.9em;
+					}
+				}
+			}
+		}
+		.input::placeholder {
+			font-family: 'Poppins', serif;
+		}
+		.inputWrapper {
+			display: flex;
+			gap: 5px;
+			width: 333px;
+			div input {
+				padding: 10px 0;
+			}
+		}
+		.button {
+			width: 350px;
+		}
+		.link {
+			margin: 20px 0;
+		}
+	}
+}

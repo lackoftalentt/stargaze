@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import App from './App';
 import './firebase';
-import { BoardPage } from './pages/BoardPage';
+import { BoardPage } from './pages/BoardPage/BoardPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 

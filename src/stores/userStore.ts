@@ -6,13 +6,7 @@ interface IUser {
 	email: string | null;
 	token: string | null;
 }
-export class AuthStore {
-	user: IUser | null = {
-		id: null,
-		userName: null,
-		email: null,
-		token: null,
-	};
+export class UserStore {
 	constructor() {
 		makeAutoObservable(this);
 
@@ -21,6 +15,14 @@ export class AuthStore {
 			this.user = JSON.parse(storedUser);
 		}
 	}
+
+	user: IUser | null = {
+		id: null,
+		userName: null,
+		email: null,
+		token: null,
+	};
+
 	setUser = (user: IUser) => {
 		this.user = user;
 		localStorage.setItem('user', JSON.stringify(user));
@@ -32,4 +34,4 @@ export class AuthStore {
 	};
 }
 
-export default new AuthStore();
+export default new UserStore();

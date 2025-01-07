@@ -1,5 +1,7 @@
 import {
+	HighlightOutlined,
 	LockOutlined,
+	LoginOutlined,
 	MailOutlined,
 	UserOutlined,
 	XOutlined,
@@ -9,10 +11,12 @@ import {
 	getAuth,
 	updateProfile,
 } from 'firebase/auth';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import authStore from '../../stores/auth-store';
-import st from './Form.module.scss';
+import authStore from '../../stores/userStore';
+import { Button } from '../ui/button/button';
+import st from './forms.module.scss';
 import logo from '/src/assets/images/logo-black.png';
 
 export interface IForm {
@@ -30,11 +34,19 @@ export const RegisterForm = () => {
 		}
 	);
 
+	const [firebaseError, setFirebaseError] = useState({
+		email: '',
+		userName: '',
+		password: '',
+	});
+
 	const { setUser } = authStore;
 
-	const emailError = formState.errors['email']?.message;
-	const userNameError = formState.errors['userName']?.message;
-	const passwordError = formState.errors['password']?.message;
+	const emailError = formState.errors['email']?.message || firebaseError.email;
+	const userNameError =
+		formState.errors['userName']?.message || firebaseError.userName;
+	const passwordError =
+		formState.errors['password']?.message || firebaseError.password;
 	const password2Error = formState.errors['password2']?.message;
 
 	const email = watch('email');
@@ -44,6 +56,7 @@ export const RegisterForm = () => {
 
 	const onSubmit: SubmitHandler<IForm> = async () => {
 		const auth = getAuth();
+		setFirebaseError({ email: '', userName: '', password: '' });
 		try {
 			const { user } = await createUserWithEmailAndPassword(
 				auth,
@@ -64,16 +77,53 @@ export const RegisterForm = () => {
 			};
 
 			setUser(userData);
-
 			localStorage.setItem('user', JSON.stringify(userData));
-
 			navigate('/');
 		} catch (error) {
-			console.error;
+			if (error instanceof Error) {
+				switch (error.message) {
+					case 'auth/email-already-in-use':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Email is already in use.',
+						}));
+						break;
+					case 'auth/invalid-email':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Invalid email address.',
+						}));
+						break;
+					case 'auth/weak-password':
+						setFirebaseError(prev => ({
+							...prev,
+							password: 'Password is too weak.',
+						}));
+						break;
+					case 'auth/operation-not-allowed':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Operation not allowed.',
+						}));
+						break;
+					case 'auth/network-request-failed':
+						setFirebaseError(prev => ({
+							...prev,
+							email: 'Network error, please try again.',
+						}));
+						break;
+					default:
+						console.error('An unexpected error occurred:', error.message);
+				}
+			}
 		}
 	};
+
 	return (
-		<>
+		<div className={st.wrapperForm}>
+			<p className={st.formTitle}>
+				morninginheaven <HighlightOutlined />
+			</p>
 			<form className={st.form} onSubmit={handleSubmit(onSubmit)}>
 				<div className={st.form__header}>
 					<img className={st.form__logo} src={logo} alt='' />
@@ -83,6 +133,8 @@ export const RegisterForm = () => {
 						<label>
 							{userNameError ? (
 								<p style={{ color: 'tomato' }}>{userNameError}</p>
+							) : firebaseError.userName ? (
+								<p style={{ color: 'tomato' }}>{firebaseError.userName}</p>
 							) : (
 								'Username'
 							)}
@@ -107,7 +159,7 @@ export const RegisterForm = () => {
 							{emailError ? (
 								<p style={{ color: 'tomato' }}>{emailError}</p>
 							) : (
-								'Email Adress'
+								'Email Address'
 							)}
 						</label>
 						<div className={st.inputWrapper}>
@@ -176,13 +228,15 @@ export const RegisterForm = () => {
 						</div>
 					</div>
 					<div>
-						<button className={st.button}>Sign Up</button>
+						<Button onClick={handleSubmit(onSubmit)} className={st.button}>
+							Sign Up <LoginOutlined/>
+						</Button>
 						<p className={st.link}>
 							Already have an account? <Link to='/login'>Log in</Link>
 						</p>
 					</div>
 				</div>
 			</form>
-		</>
+		</div>
 	);
 };

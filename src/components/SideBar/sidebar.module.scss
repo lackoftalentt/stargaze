@@ -1,16 +1,25 @@
 .sidebar {
 	height: 100vh;
-	.sidebarHeader {
+	&Header {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		height: 105px;
-		.sidebarLogo {
-			width: 250px;
-			cursor: pointer;
-		}
+	}
+	&Logo {
+		width: 250px;
+		cursor: pointer;
 	}
 	.menu {
 		margin-top: 20px;
+		height: 690px;
+	}
+	&Footer{
+		display: flex;
+		justify-content: center;
+		align-items: end;
+	}
+	&Button{
+		width: 250px;
 	}
 }

@@ -1,0 +1,98 @@
+.modalBg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 999;
+	&::before {
+		content: '';
+		background: #333;
+		opacity: 0.8;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -1;
+	}
+}
+.modal {
+	width: 1000px;
+	opacity: 100%;
+	background: hsl(218deg 50% 91%);
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 12px;
+	padding: 20px;
+	z-index: 1000;
+	&Header{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 50px;
+		.closeModalBtn{
+			cursor: pointer;
+		}
+	}
+	.taskTitle {
+		margin-bottom: 50px;
+	}
+	.taskDesc {
+		height: 250px;
+	}
+	.taskTitle,
+	.taskDesc {
+		background: hsl(0deg 0% 100%);
+		box-shadow: 0 0 2em hsl(231deg 62% 94%);
+		padding: 1em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		border-radius: 20px;
+		color: hsl(0deg 0% 30%);
+		margin-top: -3em;
+		input {
+			outline: none;
+			border: none;
+			&::placeholder {
+				color: hsl(0deg 0% 0%);
+				font-size: 0.9em;
+			}
+		}
+	}
+	.inputWrapper {
+		display: flex;
+    gap: 5px;
+    width: 100%;
+		div input {
+			padding: 10px 0;
+		}
+		.textArea {
+			width: 100%;
+			height: 200px;
+			min-height: 200px;
+			max-height: 200px;
+			outline: none;
+			border: none;
+			resize: none;
+			padding: 0;
+			box-sizing: border-box;
+			word-wrap: break-word;
+			word-break: break-word; 
+		}
+	}
+	.buttonWrapper{
+		display: flex;
+		justify-content: end;
+	}
+	.modalButton{
+		margin-top: 20px;
+		justify-content: end;
+		width: 500px;
+	}
+}
