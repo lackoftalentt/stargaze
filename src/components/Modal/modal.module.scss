@@ -14,14 +14,12 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		width: 100%;
-		height: 100%;
 		z-index: -1;
 	}
 }
+
 .modal {
 	width: 1000px;
-	opacity: 100%;
 	background: hsl(218deg 50% 91%);
 	position: fixed;
 	top: 50%;
@@ -30,24 +28,24 @@
 	border-radius: 12px;
 	padding: 20px;
 	z-index: 1000;
-	&Header{
+	opacity: 1;
+
+	&Title{
+		color: hsl(233, 60%, 44%);
+	}
+	&Header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 50px;
-		.closeModalBtn{
+		.closeModalBtn {
 			cursor: pointer;
 		}
 	}
-	.taskTitle {
-		margin-bottom: 50px;
-	}
-	.taskDesc {
-		height: 250px;
-	}
+
 	.taskTitle,
 	.taskDesc {
-		background: hsl(0deg 0% 100%);
+		background: #fff;
 		box-shadow: 0 0 2em hsl(231deg 62% 94%);
 		padding: 1em;
 		display: flex;
@@ -56,43 +54,71 @@
 		border-radius: 20px;
 		color: hsl(0deg 0% 30%);
 		margin-top: -3em;
+	}
+
+	.taskTitle {
+		margin-bottom: 70px;
+	}
+
+	.taskDesc {
+		height: 250px;
+	}
+
+	.inputWrapper {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		gap: 5px;
+
 		input {
 			outline: none;
 			border: none;
+			padding: 10px 0;
 			&::placeholder {
-				color: hsl(0deg 0% 0%);
+				color: #000;
 				font-size: 0.9em;
 			}
 		}
-	}
-	.inputWrapper {
-		display: flex;
-    gap: 5px;
-    width: 100%;
-		div input {
-			padding: 10px 0;
+
+		.toolbar {
+			display: flex;
+			gap: 10px;
+			button {
+				border: none;
+				background: transparent;
+				cursor: pointer;
+			}
 		}
+
 		.textArea {
 			width: 100%;
 			height: 200px;
 			min-height: 200px;
 			max-height: 200px;
-			outline: none;
-			border: none;
 			resize: none;
-			padding: 0;
 			box-sizing: border-box;
 			word-wrap: break-word;
-			word-break: break-word; 
+		}
+		.inputForm {
+			display: flex;
+			flex-direction: row;
+			align-items: start;
+			gap: 2px;
 		}
 	}
-	.buttonWrapper{
+
+	.buttonWrapper {
 		display: flex;
 		justify-content: end;
 	}
-	.modalButton{
-		margin-top: 20px;
-		justify-content: end;
+
+	.modalButton {
 		width: 500px;
+		margin-top: 20px;
 	}
+}
+
+.ProseMirror:focus {
+	outline: none !important;
+	border: none !important;
 }
