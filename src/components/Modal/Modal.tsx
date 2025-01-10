@@ -1,38 +1,41 @@
-import {
-	BoldOutlined,
-	CloseOutlined,
-	HighlightOutlined,
-	ItalicOutlined,
-	LinkOutlined,
-	StrikethroughOutlined,
-	UnderlineOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import Bold from '@tiptap/extension-bold';
-import Link from '@tiptap/extension-link'
 import Italic from '@tiptap/extension-italic';
+import Link from '@tiptap/extension-link';
 import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import cn from 'classnames';
+import { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import columnStore from '../../stores/columnStore';
+import { EditorText } from '../EditorButtons';
 import { Button } from '../ui/button/button';
-import s from './modal.module.scss';
-
+import s from './Modal.module.scss';
 interface ModalProps {
 	isOpen: boolean;
 	closeModal: () => void;
+	columnId: string;
+	title: string;
+	taskId: string | undefined;
 }
 
-export const Modal = ({ isOpen, closeModal }: ModalProps) => {
+export const Modal = ({
+	isOpen,
+	closeModal,
+	columnId,
+	title,
+	taskId,
+}: ModalProps) => {
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation();
 		closeModal();
 	};
 
-	const editor = useEditor({
+	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
-		content: '<p>Task description here...</p>',
+		content: taskId ? '' : 'Task title here...',
 		editorProps: {
 			attributes: {
 				class:
@@ -41,82 +44,78 @@ export const Modal = ({ isOpen, closeModal }: ModalProps) => {
 		},
 	});
 
-	const toggleBold = () => {
-		editor?.chain().focus().toggleBold().run();
+	const editorDesc = useEditor({
+		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
+		content: taskId ? '' : 'Task description here...',
+		editorProps: {
+			attributes: {
+				class:
+					'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+			},
+		},
+	});
+
+	useEffect(() => {
+		if (taskId) {
+			const task = columnStore.columns
+				.find(column => column.id === columnId)
+				?.tasks.find(task => task.id === taskId);
+			if (task) {
+				editorTitle?.commands.setContent(task.title);
+				editorDesc?.commands.setContent(task.description);
+			}
+		}
+	}, [taskId, columnId]);
+
+	const handleAddTask = () => {
+		const title = editorTitle?.getHTML() || '';
+		const description = editorDesc?.getHTML() || '';
+		columnStore.addTaskToColumn(title, description, columnId);
+		closeModal();
 	};
 
-	const toggleLink = () => {
-		editor?.chain().focus().toggleBold().run();
-	};
-
-	const toggleItalic = () => {
-		editor?.chain().focus().toggleItalic().run();
-	};
-
-	const toggleUnderline = () => {
-		editor?.chain().focus().toggleUnderline().run();
-	};
-
-	const toggleStrike = () => {
-		editor?.chain().toggleStrike().run();
+	const handleEditTask = () => {
+		const newTitle = editorTitle?.getHTML() || '';
+		const newDescription = editorDesc?.getHTML() || '';
+		columnStore.editTask(taskId, columnId, newTitle, newDescription);
+		closeModal();
 	};
 
 	if (!isOpen) return null;
-
 	return ReactDOM.createPortal(
 		<div className={s.modalBg} onClick={handleContentClick}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
-					<h1 className={s.modalTitle}>Create Task</h1>
+					<h1 className={s.modalTitle}>{title} Task</h1>
 					<CloseOutlined className={s.closeModalBtn} onClick={closeModal} />
 				</div>
 				<div className={s.taskTitle}>
 					<label htmlFor='Sex'>Task title</label>
 					<div className={s.inputWrapper}>
 						<div>
-							<HighlightOutlined />
-							<input
-								placeholder='Task title'
-								className={cn(s.modal__input, s.input)}
-								type='text'
-							/>
+							<EditorText editor={editorTitle} />
 						</div>
 					</div>
 				</div>
 				<div className={s.taskDesc}>
 					<label htmlFor='Sex'>Task description</label>
-					<div className={s.inputWrapper}>
-						<div className={s.inputForm}>
-							<HighlightOutlined />
-							<EditorContent
-								className={s.textArea}
-								editor={editor}
-								placeholder='Task description'
-							/>
-						</div>
-						<div className={s.toolbar}>
-							<button onClick={toggleBold}>
-								<BoldOutlined /> Bold
-							</button>
-							<button onClick={toggleItalic}>
-								<ItalicOutlined /> Italic
-							</button>
-							<button onClick={toggleUnderline}>
-								<UnderlineOutlined /> Underline
-							</button>
-							<button onClick={toggleStrike}>
-								<StrikethroughOutlined /> Strike
-							</button>
-							<button onClick={toggleLink}>
-								<LinkOutlined /> Link
-							</button>
-						</div>
+					<div className={cn(s.inputWrapper, s.textArea)}>
+						<EditorText editor={editorDesc} />
 					</div>
-				</div>
-				<div className={s.buttonWrapper}>
-					<Button className={s.modalButton} onClick={() => {}}>
-						Create task
-					</Button>
+					<div className={s.buttonWrapper}>
+						{title === 'Edit' ? (
+							<Button
+								className={s.modalButton}
+								onClick={() => handleEditTask()}
+							>
+								Edit task
+							</Button>
+						) : (
+							<Button className={s.modalButton} onClick={() => handleAddTask()}>
+								Create task
+							</Button>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>,

@@ -57,62 +57,9 @@
 	}
 
 	.taskTitle {
-		margin-bottom: 70px;
-	}
-
-	.textArea {
+		// margin-bottom: 70px;
+		// height: 70px;
 		width: 100%;
-		height: 200px;
-		resize: none;
-		box-sizing: border-box;
-		word-wrap: break-word;
-	}
-
-	.taskDesc {
-		height: 250px;
-	}
-
-	.inputWrapper {
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		gap: 5px;
-
-		input {
-			outline: none;
-			border: none;
-			padding: 10px 0;
-			&::placeholder {
-				color: #000;
-				font-size: 0.9em;
-			}
-		}
-
-		.toolbar {
-			display: flex;
-			gap: 10px;
-			button {
-				border: none;
-				background: transparent;
-				cursor: pointer;
-			}
-		}
-
-		.textArea {
-			width: 100%;
-			height: 200px;
-			min-height: 200px;
-			max-height: 200px;
-			resize: none;
-			box-sizing: border-box;
-			word-wrap: break-word;
-		}
-		.inputForm {
-			display: flex;
-			flex-direction: row;
-			align-items: start;
-			gap: 2px;
-		}
 	}
 
 	.buttonWrapper {
@@ -124,9 +71,4 @@
 		width: 500px;
 		margin-top: 20px;
 	}
-}
-
-.ProseMirror:focus {
-	outline: none !important;
-	border: none !important;
 }
