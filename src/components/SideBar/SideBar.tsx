@@ -1,8 +1,15 @@
-import { CodeSandboxCircleFilled, HomeTwoTone, LogoutOutlined, ProjectTwoTone } from '@ant-design/icons';
-import { Divider, Layout, Menu } from 'antd';
+import {
+	ControlOutlined,
+	HomeTwoTone,
+	LogoutOutlined,
+} from '@ant-design/icons';
+import { Divider, Layout, Menu, MenuProps } from 'antd';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import columnStore from '../../stores/columnStore';
 import userStore from '../../stores/userStore';
-import { Button } from '../ui/button/button';
+import { Modal4Column } from '../Modal4Columns/Modal4Column';
+import { Button } from '../ui/Button/Button';
 import st from './sidebar.module.scss';
 import logo from '/src/assets/images/logo.png';
 
@@ -13,25 +20,34 @@ export const SideBar = () => {
 	const isAuth = !!userStore.user?.token;
 	const navigate = useNavigate();
 
-	const menuItems = [
+	const [isOpen, setIsOpen] = useState(false);
+
+	const closeModal = () => setIsOpen(false);
+
+	const menuItems: MenuProps['items'] = [
 		{
 			key: '1',
 			icon: <HomeTwoTone />,
 			label: 'Board',
 			onClick: () => navigate('/'),
 		},
+		...(columnStore.columns.length < 4
+			? [
+					{
+						key: '2',
+						icon: <ControlOutlined />,
+						label: 'Create column',
+						onClick: () => setIsOpen(true),
+					},
+			  ]
+			: []),
 		{
-			key: '2',
-			icon: <ProjectTwoTone />,
+			key: '3',
 			label: 'Projects',
-			onClick: () => navigate(`/`),
+			type: 'group',
 			children: [
-				{
-					key: '2',
-					icon: <CodeSandboxCircleFilled />,
-					label: 'Sex',
-					onClick: () => navigate('/'),
-				},
+				{ key: '13', icon: <ControlOutlined />, label: 'Option 13' },
+				{ key: '14', icon: <ControlOutlined />, label: 'Option 14' },
 			],
 		},
 	];
@@ -62,14 +78,16 @@ export const SideBar = () => {
 					defaultSelectedKeys={['1']}
 					items={menuItems}
 				/>
-				{isAuth ? (
+				{isAuth && (
 					<div className={st.sidebarFooter}>
 						<Button className={st.sidebarButton} onClick={() => removeUser()}>
-							logout <LogoutOutlined/>
+							logout <LogoutOutlined />
 						</Button>
 					</div>
-				) : null}
+				)}
 			</Sider>
+
+			<Modal4Column closeModalCol={closeModal} isOpenCol={isOpen} />
 		</>
 	);
 };

@@ -25,6 +25,14 @@ class ColumnStore {
 		makeAutoObservable(this);
 	}
 
+	createColumn = (title: string) => {
+		this.columns.push({ id: uuidv4(), title: title, tasks: [] });
+	};
+
+	deleteColumn = (columnId: string) => {
+		this.columns = this.columns.filter(column => column.id !== columnId);
+	};
+
 	addTaskToColumn = (title: string, description: string, columnId: string) => {
 		const column = this.columns.find(column => column.id === columnId);
 		if (column) {
@@ -51,7 +59,6 @@ class ColumnStore {
 			if (task) {
 				task.title = newTitle;
 				task.description = newDescription;
-				console.log('Updated Task:', task);
 			}
 		}
 	};

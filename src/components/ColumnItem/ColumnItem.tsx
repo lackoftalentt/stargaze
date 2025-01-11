@@ -1,4 +1,4 @@
-import { HighlightOutlined, XOutlined } from '@ant-design/icons';
+import { DeleteOutlined, HighlightOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { observer } from 'mobx-react-lite';
 import columnStore, { ITask } from '../../stores/columnStore';
@@ -27,7 +27,7 @@ export const ColumnItem = observer(
 
 				<div className={s.cardFooter}>
 					<button onClick={deleteTask} className={s.cardButtons}>
-						Delete <XOutlined />
+						Delete <DeleteOutlined />
 					</button>
 					<button onClick={() => openModal(task.id)} className={s.cardButtons}>
 						Edit <HighlightOutlined />

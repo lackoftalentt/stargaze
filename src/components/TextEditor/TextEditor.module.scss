@@ -1,0 +1,23 @@
+.inputWrapper {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+
+	.inputForm {
+		display: flex;
+		flex-direction: row;
+		align-items: start;
+		gap: 2px;
+	}
+}
+
+.toolbar {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+	button {
+		border: none;
+		background: transparent;
+		cursor: pointer;
+	}
+}

@@ -7,9 +7,10 @@ import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import ReactDOM from 'react-dom';
-import { EditorText } from '../EditorButtons';
-import { Button } from '../ui/button/button';
-import s from './modal4Columns.module.scss';
+import columnStore from '../../stores/columnStore';
+import { TextEditor } from '../TextEditor/TextEditor';
+import { Button } from '../ui/Button/Button';
+import s from './Modal4Column.module.scss';
 
 interface ModalProps {
 	isOpenCol: boolean;
@@ -17,37 +18,46 @@ interface ModalProps {
 }
 
 export const Modal4Column = ({ isOpenCol, closeModalCol }: ModalProps) => {
-	const handleContentClick = (event: React.MouseEvent) => {
-		event.stopPropagation();
-		closeModalCol();
-	};
-
-	const editor = useEditor({
+	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
-		content: '<p>Task description here...</p>',
+		content: '<p>Column title...</p>',
+		autofocus: true,
 		editorProps: {
 			attributes: {
-				class:
-					'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+				class: `${s.editorTitle}`,
 			},
 		},
 	});
 
+	const createColumnHandler = () => {
+		const title = editorTitle?.getHTML() || '';
+		columnStore.createColumn(title);
+		closeModalCol();
+	};
+
 	if (!isOpenCol) return null;
 
 	return ReactDOM.createPortal(
-		<div className={s.modalBg} onClick={handleContentClick}>
+		<div className={s.modalBg} onClick={closeModalCol}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
 					<h1 className={s.modalTitle}>Create column</h1>
 					<CloseOutlined className={s.closeModalBtn} onClick={closeModalCol} />
 				</div>
 				<div className={s.taskTitle}>
-					<label htmlFor='Sex'>Task title</label>
-					<EditorText editor={editor} />
+					<label htmlFor='taskTitle'>Task title</label>
+					<TextEditor
+						onContentChange={content =>
+							editorTitle?.commands.setContent(content)
+						}
+						editor={editorTitle}
+					/>
 				</div>
 				<div className={s.buttonWrapper}>
-					<Button className={s.modalButton} onClick={() => {}}>
+					<Button
+						className={s.modalButton}
+						onClick={() => createColumnHandler()}
+					>
 						Create column
 					</Button>
 				</div>

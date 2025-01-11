@@ -6,8 +6,9 @@
 	border-radius: 30px;
 	font-weight: 600;
 	cursor: pointer;
-	transition: all .3s;
+	transition: all 0.3s;
 	&:hover {
-		background: hsl(233, 60%, 44%);
+		background: hsl(233, 100%, 73%);
+		color: hsl(233deg 36% 38%);
 	}
 }

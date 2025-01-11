@@ -43,8 +43,7 @@
 		}
 	}
 
-	.taskTitle,
-	.taskDesc {
+	.taskTitle {
 		background: #fff;
 		box-shadow: 0 0 2em hsl(231deg 62% 94%);
 		padding: 1em;
@@ -56,12 +55,6 @@
 		margin-top: -3em;
 	}
 
-	.taskTitle {
-		// margin-bottom: 70px;
-		// height: 70px;
-		width: 100%;
-	}
-
 	.buttonWrapper {
 		display: flex;
 		justify-content: end;
@@ -71,4 +64,8 @@
 		width: 500px;
 		margin-top: 20px;
 	}
+}
+.editorTitle {
+	outline: none;
+	width: 900px;
 }

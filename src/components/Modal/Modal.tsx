@@ -1,6 +1,7 @@
 import { CloseOutlined } from '@ant-design/icons';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
+import TurndownService from 'turndown';
 import Link from '@tiptap/extension-link';
 import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
@@ -10,8 +11,8 @@ import cn from 'classnames';
 import { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import columnStore from '../../stores/columnStore';
-import { EditorText } from '../EditorButtons';
-import { Button } from '../ui/button/button';
+import { TextEditor } from '../TextEditor/TextEditor';
+import { Button } from '../ui/Button/Button';
 import s from './Modal.module.scss';
 interface ModalProps {
 	isOpen: boolean;
@@ -38,8 +39,7 @@ export const Modal = ({
 		content: taskId ? '' : 'Task title here...',
 		editorProps: {
 			attributes: {
-				class:
-					'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+				class: `${s.editorTitle}`,
 			},
 		},
 	});
@@ -47,10 +47,10 @@ export const Modal = ({
 	const editorDesc = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
 		content: taskId ? '' : 'Task description here...',
+
 		editorProps: {
 			attributes: {
-				class:
-					'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+				class: ` ${s.editorDesc}`,
 			},
 		},
 	});
@@ -67,17 +67,27 @@ export const Modal = ({
 		}
 	}, [taskId, columnId]);
 
+	const turndownService = new TurndownService();
+
 	const handleAddTask = () => {
 		const title = editorTitle?.getHTML() || '';
+		const markdownTitle = turndownService.turndown(title);
+	
 		const description = editorDesc?.getHTML() || '';
-		columnStore.addTaskToColumn(title, description, columnId);
+		const markdownDescription = turndownService.turndown(description);
+	
+		columnStore.addTaskToColumn(markdownTitle, markdownDescription, columnId);
 		closeModal();
 	};
 
 	const handleEditTask = () => {
 		const newTitle = editorTitle?.getHTML() || '';
+		const markdownTitle = turndownService.turndown(newTitle);
+
 		const newDescription = editorDesc?.getHTML() || '';
-		columnStore.editTask(taskId, columnId, newTitle, newDescription);
+		const markdownDesc = turndownService.turndown(newDescription);
+
+		columnStore.editTask(taskId, columnId, markdownTitle, markdownDesc);
 		closeModal();
 	};
 
@@ -93,29 +103,38 @@ export const Modal = ({
 					<label htmlFor='Sex'>Task title</label>
 					<div className={s.inputWrapper}>
 						<div>
-							<EditorText editor={editorTitle} />
+							<TextEditor
+								onContentChange={content =>
+									editorTitle?.commands.setContent(content)
+								}
+								className={s.titleEditor}
+								editor={editorTitle}
+							/>
 						</div>
 					</div>
 				</div>
 				<div className={s.taskDesc}>
 					<label htmlFor='Sex'>Task description</label>
 					<div className={cn(s.inputWrapper, s.textArea)}>
-						<EditorText editor={editorDesc} />
+						<TextEditor
+							onContentChange={content =>
+								editorDesc?.commands.setContent(content)
+							}
+							className={s.descEditor}
+							editor={editorDesc}
+						/>
 					</div>
-					<div className={s.buttonWrapper}>
-						{title === 'Edit' ? (
-							<Button
-								className={s.modalButton}
-								onClick={() => handleEditTask()}
-							>
-								Edit task
-							</Button>
-						) : (
-							<Button className={s.modalButton} onClick={() => handleAddTask()}>
-								Create task
-							</Button>
-						)}
-					</div>
+				</div>
+				<div className={s.buttonWrapper}>
+					{title === 'Edit' ? (
+						<Button className={s.modalButton} onClick={() => handleEditTask()}>
+							Edit task
+						</Button>
+					) : (
+						<Button className={s.modalButton} onClick={() => handleAddTask()}>
+							Create task
+						</Button>
+					)}
 				</div>
 			</div>
 		</div>,

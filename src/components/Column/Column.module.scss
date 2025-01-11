@@ -1,6 +1,7 @@
 .column {
 	display: flex;
 	flex-direction: column;
+	position: relative;
 	max-width: 400px;
 	background: hsl(218deg 50% 91%);
 	border-radius: 10px;
@@ -8,9 +9,18 @@
 	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 	&Title {
 		font-size: 24px;
-		margin-bottom: 10px;
 		color: hsl(233, 60%, 44%);
 	}
+}
+.columnHeader{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.deleteBtn{
+	cursor: pointer;
 }
 .taskInput {
 	padding: 8px;
@@ -20,7 +30,7 @@
 }
 .tasksInBtn {
 	display: flex;
-	justify-content: space-around;
 	flex-direction: column;
 	margin-bottom: 3px;
+	justify-content: space-between;
 }

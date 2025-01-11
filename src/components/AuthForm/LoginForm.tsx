@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import authStore from '../../stores/userStore';
-import { Button } from '../ui/button/button';
+import { Button } from '../ui/Button/Button';
 import st from './forms.module.scss';
 import { IForm } from './RegisterForm';
 import logo from '/src/assets/images/logo-black.png';
@@ -101,7 +101,7 @@ export const LoginForm = () => {
 							password: 'Network error, please try again.',
 						}));
 						break;
-						case 'auth/too-many-requests':
+					case 'auth/too-many-requests':
 						setFirebaseError(prev => ({
 							...prev,
 							password: 'Network error, please try again.',
@@ -185,7 +185,7 @@ export const LoginForm = () => {
 								className={st.button}
 								onClick={() => handleSubmit(onSubmit)}
 							>
-								Login <LoginOutlined/>
+								Login <LoginOutlined />
 							</Button>
 							<p className={st.link}>
 								Don't have an account? <Link to='/register'>Sign up</Link>

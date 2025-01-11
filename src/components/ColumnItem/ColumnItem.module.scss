@@ -4,9 +4,15 @@
 	border-radius: 12px;
 	background: rgb(255, 255, 255);
 	box-shadow: 1px;
+	&Title{
+		word-break: break-all;
+	}
 	&Footer {
 		display: flex;
 		gap: 15px;
+	}
+	&Description{
+		word-break: break-all;
 	}
 	&Buttons {
 		background: transparent;

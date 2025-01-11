@@ -1,9 +1,10 @@
+import { DeleteOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import columnStore from '../../stores/columnStore';
 import { ColumnItem } from '../ColumnItem/ColumnItem';
 import { Modal } from '../Modal/Modal';
-import { Button } from '../ui/button/button';
+import { Button } from '../ui/Button/Button';
 import s from './Column.module.scss';
 
 interface ColumnProps {
@@ -20,16 +21,25 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 	const column = columnStore.columns.find(column => column.id === columnId);
 	const tasks = column ? column.tasks : [];
 
+	const deleteColumn = (colummnId: string) => {
+		columnStore.deleteColumn(colummnId);
+	};
+
 	const openModal = (mode: 'Create' | 'Edit', id?: string) => {
 		setTaskId(id);
-		console.log(id)
 		setModalMode(mode);
 		setModalIsOpen(true);
 	};
 
 	return (
 		<div className={s.column}>
-			<h2 className={s.columnTitle}>{title}</h2>
+			<div className={s.columnHeader}>
+				<h2 className={s.columnTitle}>{title}</h2>
+				<DeleteOutlined
+					onClick={() => deleteColumn(columnId)}
+					className={s.deleteBtn}
+				/>
+			</div>
 			<div className={s.taskContainer}>
 				{tasks.map(task => (
 					<ColumnItem

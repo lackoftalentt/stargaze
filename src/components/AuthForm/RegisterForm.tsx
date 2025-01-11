@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import authStore from '../../stores/userStore';
-import { Button } from '../ui/button/button';
+import { Button } from '../ui/Button/Button';
 import st from './forms.module.scss';
 import logo from '/src/assets/images/logo-black.png';
 
@@ -229,7 +229,7 @@ export const RegisterForm = () => {
 					</div>
 					<div>
 						<Button onClick={handleSubmit(onSubmit)} className={st.button}>
-							Sign Up <LoginOutlined/>
+							Sign Up <LoginOutlined />
 						</Button>
 						<p className={st.link}>
 							Already have an account? <Link to='/login'>Log in</Link>
