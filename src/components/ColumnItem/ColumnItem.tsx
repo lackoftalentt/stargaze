@@ -1,4 +1,6 @@
 import { DeleteOutlined, HighlightOutlined } from '@ant-design/icons';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Divider } from 'antd';
 import { observer } from 'mobx-react-lite';
 import columnStore, { ITask } from '../../stores/columnStore';
@@ -12,12 +14,26 @@ interface ColumnItemProps {
 
 export const ColumnItem = observer(
 	({ task, columnId, openModal }: ColumnItemProps) => {
+		const { attributes, listeners, setNodeRef, transform, transition } =
+			useSortable({ id: task.id });
+
+		const style = {
+			transform: CSS.Transform.toString(transform),
+			transition,
+		};
+
 		const deleteTask = () => {
 			columnStore.deletefromTask(task.id, columnId);
 		};
 
 		return (
-			<div className={s.card}>
+			<div
+				ref={setNodeRef}
+				style={style}
+				{...attributes}
+				{...listeners}
+				className={s.card}
+			>
 				<div className={s.cardHeader}>
 					<h3 className={s.cardTitle}>{task.title}</h3>
 					<Divider style={{ margin: 10 }} />

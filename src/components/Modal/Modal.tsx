@@ -1,7 +1,6 @@
 import { CloseOutlined } from '@ant-design/icons';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
-import TurndownService from 'turndown';
 import Link from '@tiptap/extension-link';
 import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
@@ -10,6 +9,7 @@ import StarterKit from '@tiptap/starter-kit';
 import cn from 'classnames';
 import { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import TurndownService from 'turndown';
 import columnStore from '../../stores/columnStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
@@ -72,10 +72,10 @@ export const Modal = ({
 	const handleAddTask = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
-	
+
 		const description = editorDesc?.getHTML() || '';
 		const markdownDescription = turndownService.turndown(description);
-	
+
 		columnStore.addTaskToColumn(markdownTitle, markdownDescription, columnId);
 		closeModal();
 	};
@@ -103,26 +103,14 @@ export const Modal = ({
 					<label htmlFor='Sex'>Task title</label>
 					<div className={s.inputWrapper}>
 						<div>
-							<TextEditor
-								onContentChange={content =>
-									editorTitle?.commands.setContent(content)
-								}
-								className={s.titleEditor}
-								editor={editorTitle}
-							/>
+							<TextEditor className={s.titleEditor} editor={editorTitle} />
 						</div>
 					</div>
 				</div>
 				<div className={s.taskDesc}>
 					<label htmlFor='Sex'>Task description</label>
 					<div className={cn(s.inputWrapper, s.textArea)}>
-						<TextEditor
-							onContentChange={content =>
-								editorDesc?.commands.setContent(content)
-							}
-							className={s.descEditor}
-							editor={editorDesc}
-						/>
+						<TextEditor className={s.descEditor} editor={editorDesc} />
 					</div>
 				</div>
 				<div className={s.buttonWrapper}>

@@ -11,26 +11,32 @@
 		font-size: 24px;
 		color: hsl(233, 60%, 44%);
 	}
-}
-.columnHeader{
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 10px;
-}
-
-.deleteBtn{
-	cursor: pointer;
-}
-.taskInput {
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	margin-bottom: 10px;
-}
-.tasksInBtn {
-	display: flex;
-	flex-direction: column;
-	margin-bottom: 3px;
-	justify-content: space-between;
+	&Header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+	}
+	&ActionsBtn {
+		display: flex;
+		gap: 10px;
+		.editBtn {
+			cursor: pointer;
+		}
+		.deleteBtn {
+			cursor: pointer;
+		}
+	}
+	.taskInput {
+		padding: 8px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		margin-bottom: 10px;
+	}
+	.tasksInBtn {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 3px;
+		justify-content: space-between;
+	}
 }

@@ -47,6 +47,13 @@ class ColumnStore {
 		}
 	};
 
+	editColumn = (columnId: string | undefined, newTitle: string) => {
+		const column = this.columns.find(column => column.id === columnId);
+		if (column) {
+			column.title = newTitle;
+		}
+	};
+
 	editTask = (
 		taskId: string | undefined,
 		columnId: string,
@@ -61,6 +68,14 @@ class ColumnStore {
 				task.description = newDescription;
 			}
 		}
+	};
+
+	updateTaskOrder = (columnId: string, newTaskOrder: ITask[]) => {
+		const column = this.columns.find(column => column.id === columnId);
+		if (column) {
+			column.tasks = newTaskOrder;
+		}
+		console.log(newTaskOrder);
 	};
 }
 

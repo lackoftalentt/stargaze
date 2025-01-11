@@ -7,20 +7,28 @@ import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import ReactDOM from 'react-dom';
+import TurndownService from 'turndown';
 import columnStore from '../../stores/columnStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './Modal4Column.module.scss';
 
 interface ModalProps {
-	isOpenCol: boolean;
 	closeModalCol: () => void;
+	isOpenCol: boolean;
+	title: string;
+	columnId?: string | undefined;
 }
 
-export const Modal4Column = ({ isOpenCol, closeModalCol }: ModalProps) => {
+export const Modal4Column = ({
+	isOpenCol,
+	closeModalCol,
+	title,
+	columnId,
+}: ModalProps) => {
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
-		content: '<p>Column title...</p>',
+		content: 'Column title...',
 		autofocus: true,
 		editorProps: {
 			attributes: {
@@ -29,9 +37,19 @@ export const Modal4Column = ({ isOpenCol, closeModalCol }: ModalProps) => {
 		},
 	});
 
+	const turndownService = new TurndownService();
+
 	const createColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
-		columnStore.createColumn(title);
+		const markdownTitle = turndownService.turndown(title);
+		columnStore.createColumn(markdownTitle);
+		closeModalCol();
+	};
+
+	const editColumnHandler = () => {
+		const title = editorTitle?.getHTML() || '';
+		const markdownTitle = turndownService.turndown(title);
+		columnStore.editColumn(columnId, markdownTitle);
 		closeModalCol();
 	};
 
@@ -41,25 +59,29 @@ export const Modal4Column = ({ isOpenCol, closeModalCol }: ModalProps) => {
 		<div className={s.modalBg} onClick={closeModalCol}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
-					<h1 className={s.modalTitle}>Create column</h1>
+					<h1 className={s.modalTitle}>{title} column</h1>
 					<CloseOutlined className={s.closeModalBtn} onClick={closeModalCol} />
 				</div>
 				<div className={s.taskTitle}>
-					<label htmlFor='taskTitle'>Task title</label>
-					<TextEditor
-						onContentChange={content =>
-							editorTitle?.commands.setContent(content)
-						}
-						editor={editorTitle}
-					/>
+					<label htmlFor='taskTitle'>{title} title</label>
+					<TextEditor editor={editorTitle} />
 				</div>
 				<div className={s.buttonWrapper}>
-					<Button
-						className={s.modalButton}
-						onClick={() => createColumnHandler()}
-					>
-						Create column
-					</Button>
+					{title === 'Edit' ? (
+						<Button
+							className={s.modalButton}
+							onClick={() => editColumnHandler()}
+						>
+							Edit column
+						</Button>
+					) : (
+						<Button
+							className={s.modalButton}
+							onClick={() => createColumnHandler()}
+						>
+							Create column
+						</Button>
+					)}
 				</div>
 			</div>
 		</div>,

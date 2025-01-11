@@ -87,7 +87,11 @@ export const SideBar = () => {
 				)}
 			</Sider>
 
-			<Modal4Column closeModalCol={closeModal} isOpenCol={isOpen} />
+			<Modal4Column
+				title='Create'
+				closeModalCol={closeModal}
+				isOpenCol={isOpen}
+			/>
 		</>
 	);
 };
