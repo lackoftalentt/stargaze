@@ -1,9 +1,8 @@
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import {
 	closestCenter,
 	DndContext,
 	DragEndEvent,
-	KeyboardSensor,
 	PointerSensor,
 	useSensor,
 	useSensors,
@@ -11,21 +10,22 @@ import {
 import {
 	arrayMove,
 	SortableContext,
-	sortableKeyboardCoordinates,
+	useSortable,
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
-import columnStore from '../../stores/columnStore';
+import { useCallback, useMemo, useState } from 'react';
+import columnStore, { IColumn } from '../../stores/columnStore';
 import { ColumnItem } from '../ColumnItem/ColumnItem';
 import { Modal } from '../Modal/Modal';
 import { Modal4Column } from '../Modal4Columns/Modal4Column';
-import { Button } from '../ui/Button/Button';
 import s from './Column.module.scss';
 
 interface ColumnProps {
-	title: string;
+	title?: string;
 	columnId: string;
+	column?: IColumn;
 }
 
 export const Column = observer(({ title, columnId }: ColumnProps) => {
@@ -42,9 +42,10 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 	const tasks = column ? column.tasks : [];
 
 	const sensors = useSensors(
-		useSensor(PointerSensor),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
+		useSensor(PointerSensor, {
+			activationConstraint: {
+				distance: 10,
+			},
 		})
 	);
 
@@ -67,6 +68,24 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 		[tasks, columnId]
 	);
 
+	const { setNodeRef, attributes, listeners, transform, transition } =
+		useSortable({
+			id: columnId,
+			data: {
+				type: 'Column',
+				column,
+			},
+		});
+
+	const style = {
+		transition,
+		transform: CSS.Transform.toString(transform),
+	};
+
+	// if(isDragging){
+	// 	return <>sex</>
+	// }
+
 	const deleteColumn = useCallback(() => {
 		columnStore.deleteColumn(columnId);
 	}, [columnId]);
@@ -82,17 +101,25 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 		setColModalIsOpen(true);
 	};
 
+	const tasksIds = useMemo(() => {
+		return tasks.map(task => task.id);
+	}, [tasks]);
+
 	return (
 		<DndContext
 			sensors={sensors}
 			collisionDetection={closestCenter}
 			onDragEnd={handleDragEnd}
 		>
-			<SortableContext items={tasks} strategy={verticalListSortingStrategy}>
-				<div className={s.column}>
-					<div className={s.columnHeader}>
+			<SortableContext items={tasksIds} strategy={verticalListSortingStrategy}>
+				<div className={s.column} ref={setNodeRef} style={style}>
+					<div {...attributes} {...listeners} className={s.columnHeader}>
 						<h2 className={s.columnTitle}>{title}</h2>
 						<div className={s.columnActionsBtn}>
+							<PlusOutlined
+								onClick={() => openTaskModal('Create')}
+								className={s.addTaskBtn}
+							/>
 							<EditOutlined
 								onClick={() => openColumnModal('Edit')}
 								className={s.editBtn}
@@ -110,15 +137,6 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 							/>
 						))}
 					</div>
-					<div className={s.tasksInBtn}>
-						<Button
-							onClick={() => openTaskModal('Create')}
-							className={s.addTaskBtn}
-						>
-							Add Task
-						</Button>
-					</div>
-
 					<Modal
 						taskId={taskId}
 						title={modalMode === 'Create' ? 'Create' : 'Edit'}

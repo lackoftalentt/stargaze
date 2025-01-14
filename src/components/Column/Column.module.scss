@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	position: relative;
+	cursor: grab;
 	max-width: 400px;
 	background: hsl(218deg 50% 91%);
 	border-radius: 10px;
@@ -32,11 +33,5 @@
 		border: 1px solid #ccc;
 		border-radius: 5px;
 		margin-bottom: 10px;
-	}
-	.tasksInBtn {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 3px;
-		justify-content: space-between;
 	}
 }

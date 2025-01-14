@@ -15,7 +15,7 @@ interface ColumnItemProps {
 export const ColumnItem = observer(
 	({ task, columnId, openModal }: ColumnItemProps) => {
 		const { attributes, listeners, setNodeRef, transform, transition } =
-			useSortable({ id: task.id });
+			useSortable({ id: task.id, data: { type: 'Task', task } });
 
 		const style = {
 			transform: CSS.Transform.toString(transform),
@@ -23,7 +23,7 @@ export const ColumnItem = observer(
 		};
 
 		const deleteTask = () => {
-			columnStore.deletefromTask(task.id, columnId);
+			columnStore.deleteFromTask(task.id, columnId);
 		};
 
 		return (

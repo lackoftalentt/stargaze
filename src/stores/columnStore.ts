@@ -26,11 +26,15 @@ class ColumnStore {
 	}
 
 	createColumn = (title: string) => {
-		this.columns.push({ id: uuidv4(), title: title, tasks: [] });
+		this.columns.push({ id: uuidv4(), title, tasks: [] });
 	};
 
-	deleteColumn = (columnId: string) => {
+	deleteColumn = (columnId: string | undefined) => {
 		this.columns = this.columns.filter(column => column.id !== columnId);
+	};
+
+	updateColumns = (newColumns: IColumn[]) => {
+		this.columns = newColumns;
 	};
 
 	addTaskToColumn = (title: string, description: string, columnId: string) => {
@@ -40,7 +44,7 @@ class ColumnStore {
 		}
 	};
 
-	deletefromTask = (taskId: string, columnId: string) => {
+	deleteFromTask = (taskId: string, columnId: string) => {
 		const column = this.columns.find(column => column.id === columnId);
 		if (column) {
 			column.tasks = column.tasks.filter(task => task.id !== taskId);
@@ -75,7 +79,24 @@ class ColumnStore {
 		if (column) {
 			column.tasks = newTaskOrder;
 		}
-		console.log(newTaskOrder);
+	};
+
+	moveTaskToColumn = (
+		taskId: string,
+		sourceColumnId: string,
+		destinationColumnId: string
+	) => {
+		const sourceColumn = this.columns.find(column => column.id === sourceColumnId);
+		const destinationColumn = this.columns.find(column => column.id === destinationColumnId);
+
+		if (sourceColumn && destinationColumn) {
+			const task = sourceColumn.tasks.find(task => task.id === taskId);
+			if (task) {
+				sourceColumn.tasks = sourceColumn.tasks.filter(task => task.id !== taskId);
+				task.columnId = destinationColumnId;
+				destinationColumn.tasks.push(task);
+			}
+		}
 	};
 }
 
