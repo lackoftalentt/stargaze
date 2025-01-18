@@ -1,14 +1,10 @@
-import {
-	ControlOutlined,
-	HomeTwoTone,
-	LogoutOutlined,
-} from '@ant-design/icons';
+import { BugFilled, LogoutOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu, MenuProps } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import columnStore from '../../stores/columnStore';
 import userStore from '../../stores/userStore';
-import { Modal4Column } from '../Modal4Columns/Modal4Column';
+import { Modal4Column } from '../Modal4Columns/SingleModal';
 import { Button } from '../ui/Button/Button';
 import st from './sidebar.module.scss';
 import logo from '/src/assets/images/logo.png';
@@ -21,34 +17,32 @@ export const SideBar = () => {
 	const navigate = useNavigate();
 
 	const [isOpen, setIsOpen] = useState(false);
+	const [modalTitle, setModalTitle] = useState('');
+
+	const openModal = (title: string) => {
+		setModalTitle(title);
+		setIsOpen(true);
+	};
 
 	const closeModal = () => setIsOpen(false);
 
 	const menuItems: MenuProps['items'] = [
 		{
-			key: '1',
-			icon: <HomeTwoTone />,
-			label: 'Board',
-			onClick: () => navigate('/'),
+			key: '0',
+			icon: <BugFilled />,
+			label: 'Create Board',
+			onClick: () => openModal('Create board'),
 		},
-		...(columnStore.columns.length < 4
-			? [
-					{
-						key: '2',
-						icon: <ControlOutlined />,
-						label: 'Create column',
-						onClick: () => setIsOpen(true),
-					},
-			  ]
-			: []),
 		{
 			key: '3',
-			label: 'Projects',
+			label: 'Boards',
 			type: 'group',
-			children: [
-				{ key: '13', icon: <ControlOutlined />, label: 'Option 13' },
-				{ key: '14', icon: <ControlOutlined />, label: 'Option 14' },
-			],
+			children: columnStore.boards.map((board, index) => ({
+				key: `board-${index}`,
+				icon: <BugFilled />,
+				label: board.title,
+				onClick: () => navigate(`/board/${board.id}`),
+			})),
 		},
 	];
 
@@ -56,7 +50,7 @@ export const SideBar = () => {
 		<>
 			<Sider
 				width={300}
-				breakpoint='lg'
+				breakpoint='xxl'
 				theme='light'
 				collapsedWidth='0'
 				className={`${st.sidebar}`}
@@ -88,7 +82,7 @@ export const SideBar = () => {
 			</Sider>
 
 			<Modal4Column
-				title='Create'
+				title={modalTitle}
 				closeModalCol={closeModal}
 				isOpenCol={isOpen}
 			/>

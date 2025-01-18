@@ -96,7 +96,7 @@ export const Modal = ({
 		<div className={s.modalBg} onClick={handleContentClick}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
-					<h1 className={s.modalTitle}>{title} Task</h1>
+					<h1 className={s.modalTitle}>{title}</h1>
 					<CloseOutlined className={s.closeModalBtn} onClick={closeModal} />
 				</div>
 				<div className={s.taskTitle}>
@@ -114,7 +114,7 @@ export const Modal = ({
 					</div>
 				</div>
 				<div className={s.buttonWrapper}>
-					{title === 'Edit' ? (
+					{taskId ? (
 						<Button className={s.modalButton} onClick={() => handleEditTask()}>
 							Edit task
 						</Button>

@@ -1,6 +1,19 @@
-.boardContainer {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 30px;
-	position: relative;
+.board {
+	&Header {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 20px;
+		div{
+			display: flex;
+			gap: 10px;
+		}
+	}
+	&Title {
+		color: hsl(233, 60%, 44%);
+	}
+	.columnContainer {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 30px;
+	}
 }

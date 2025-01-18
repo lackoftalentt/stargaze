@@ -1,33 +1,31 @@
-import {
-	DndContext,
-	DragEndEvent,
-	DragOverEvent,
-	DragStartEvent,
-	PointerSensor,
-	useSensor,
-	useSensors,
-} from '@dnd-kit/core';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { EditFilled, PlusCircleTwoTone } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { Column } from '../../components/Column/Column';
-import columnStore, { IColumn, ITask } from '../../stores/columnStore';
+import { Modal4Column } from '../../components/Modal4Columns/SingleModal';
+import columnStore from '../../stores/columnStore';
 import authStore from '../../stores/userStore';
 import s from './BoardPage.module.scss';
 
 export const BoardPage = observer(() => {
 	const isAuth = authStore.user?.token;
 	const navigate = useNavigate();
+	const { id } = useParams<{ id: string | undefined }>();
 
-	const { columns } = columnStore;
-	const columnsId = useMemo(
-		() => columns.map((column: IColumn) => column.id),
-		[columns]
-	);
+	const [isOpen, setIsOpen] = useState(false);
+	const [modalTitle, setModalTitle] = useState('');
+	const board = columnStore.getBoardById(id);
 
-	const [activeColumn, setActiveColumn] = useState<IColumn | null>(null);
-	const [activeTask, setActiveTask] = useState<ITask | null>(null);
+	const openModal = (title: string, boardId?: string) => {
+		setModalTitle(title);
+		setIsOpen(true);
+		if (boardId) {
+			setModalTitle(title);
+		}
+	};
+
+	const closeModalCol = () => setIsOpen(false);
 
 	useEffect(() => {
 		if (!isAuth) {
@@ -35,117 +33,36 @@ export const BoardPage = observer(() => {
 		}
 	}, [isAuth, navigate]);
 
-	const onDragStart = (event: DragStartEvent) => {
-		if (event.active.data.current?.type === 'Column') {
-			setActiveColumn(event.active.data.current.column);
-			return;
-		}
-
-		if (event.active.data.current?.type === 'Task') {
-			setActiveTask(event.active.data.current.task);
-			return;
-		}
-	};
-
-	const onDragEnd = (event: DragEndEvent) => {
-		const { active, over } = event;
-
-		if (!over) return;
-
-		const activeColumnId = active.id;
-		const overColumnId = over.id;
-
-		if (activeColumnId === overColumnId) return;
-
-		const activeColumnIndex = columns.findIndex(
-			(column: IColumn) => column.id === activeColumnId
-		);
-		const overColumnIndex = columns.findIndex(
-			(column: IColumn) => column.id === overColumnId
-		);
-
-		const newColumns = arrayMove(columns, activeColumnIndex, overColumnIndex);
-		columnStore.updateColumns(newColumns);
-	};
-
-	const onDragOver = (event: DragOverEvent) => {
-		const { active, over } = event;
-
-		if (!over) return;
-
-		const activeId = active.id;
-		const overId = over.id;
-
-		if (activeId === overId) return;
-
-		const isActiveATask = active.data.current?.type === 'Task';
-		const isOverATask = over.data.current?.type === 'Task';
-		const isOverAColumn = over.data.current?.type === 'Column';
-
-		if (isActiveATask && isOverATask) {
-			const activeColumnId = active.data.current?.column.id;
-			const overColumnId = over.data.current?.column.id;
-
-			if (activeColumnId === overColumnId) {
-				const column = columns.find(
-					(column: IColumn) => column.id === activeColumnId
-				);
-				if (column) {
-					const activeIndex = column.tasks.findIndex(
-						(task: ITask) => task.id === activeId
-					);
-					const overIndex = column.tasks.findIndex(
-						(task: ITask) => task.id === overId
-					);
-					const newTasks = arrayMove(column.tasks, activeIndex, overIndex);
-					columnStore.updateTaskOrder(column.id, newTasks);
-				}
-			}
-		} else if (isActiveATask && isOverAColumn) {
-			const activeColumnId = active.data.current?.column.id;
-			const overColumnId = over.id;
-
-			if (activeColumnId !== overColumnId) {
-				const activeColumn = columns.find(
-					(column: IColumn) => column.id === activeColumnId
-				);
-				const overColumn = columns.find(
-					(column: IColumn) => column.id === overColumnId
-				);
-				if (activeColumn && overColumn) {
-					const activeIndex = activeColumn.tasks.findIndex(
-						(task: ITask) => task.id === activeId
-					);
-					const [movedTask] = activeColumn.tasks.splice(activeIndex, 1);
-					overColumn.tasks.push(movedTask);
-					columnStore.updateColumns([...columns]);
-				}
-			}
-		}
-	};
-
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: {
-				distance: 5,
-			},
-		})
-	);
-
 	return (
-		<DndContext
-			sensors={sensors}
-			onDragStart={onDragStart}
-			onDragEnd={onDragEnd}
-			onDragOver={onDragOver}
-		>
-			<main className={s.boardContainer}>
-				<SortableContext items={columnsId}>
-					{columns?.map(column => (
+		<>
+			<main className={s.board}>
+				<div className={s.boardHeader}>
+					<h1 className={s.boardTitle}>{board?.title || 'Board Not Found'}</h1>
+					<div>
+						<PlusCircleTwoTone
+							onClick={() => openModal('Create column')}
+							size={20}
+							className={s.addColumnBtn}
+						/>
+						<EditFilled
+							onClick={() => openModal('Edit board', board?.id)}
+							size={20}
+							className={s.editBoardBtn}
+						/>
+					</div>
+				</div>
+				<div className={s.columnContainer}>
+					{board?.columns.map(column => (
 						<Column key={column.id} title={column.title} columnId={column.id} />
-					))}
-				</SortableContext>
+					)) || <p>No columns available</p>}
+				</div>
 			</main>
-		</DndContext>
+			<Modal4Column
+				boardId={id}
+				closeModalCol={closeModalCol}
+				isOpenCol={isOpen}
+				title={modalTitle}
+			/>
+		</>
 	);
 });

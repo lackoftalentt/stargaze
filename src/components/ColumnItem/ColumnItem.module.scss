@@ -1,19 +1,28 @@
 .card {
 	padding: 10px;
 	z-index: 30;
-	cursor:grab;
 	margin: 10px 0;
 	border-radius: 12px;
 	background: rgb(255, 255, 255);
 	box-shadow: 1px;
-	&Title{
+	&Drag {
+		padding: 10px;
+		border: 2px blue solid;
+		height: 130px;
+		opacity: 50%;
+		margin: 10px 0;
+		border-radius: 12px;
+		background: rgb(255, 255, 255);
+		box-shadow: 1px;
+	}
+	&Title {
 		word-break: break-all;
 	}
 	&Footer {
 		display: flex;
 		gap: 15px;
 	}
-	&Description{
+	&Description {
 		word-break: break-all;
 	}
 	&Buttons {

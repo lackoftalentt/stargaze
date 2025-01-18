@@ -14,9 +14,7 @@ createRoot(document.getElementById('root')!).render(
 				<Route path='login' element={<LoginPage />} />
 				<Route path='register' element={<RegisterPage />} />
 				<Route path='/' element={<App />}>
-					<Route index element={<BoardPage />} />
-					<Route path='huesos' element={<BoardPage />} />
-					<Route path='tsukumi' element={<BoardPage />} />
+					<Route path='board/:id' element={<BoardPage />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>
