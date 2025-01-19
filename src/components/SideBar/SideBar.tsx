@@ -1,8 +1,9 @@
-import { BugFilled, LogoutOutlined } from '@ant-design/icons';
+import { BugFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu, MenuProps } from 'antd';
+import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import columnStore from '../../stores/columnStore';
+import boardStore from '../../stores/boardStore';
 import userStore from '../../stores/userStore';
 import { Modal4Column } from '../Modal4Columns/SingleModal';
 import { Button } from '../ui/Button/Button';
@@ -11,7 +12,7 @@ import logo from '/src/assets/images/logo.png';
 
 const { Sider } = Layout;
 
-export const SideBar = () => {
+export const SideBar = observer(() => {
 	const { removeUser } = userStore;
 	const isAuth = !!userStore.user?.token;
 	const navigate = useNavigate();
@@ -28,16 +29,10 @@ export const SideBar = () => {
 
 	const menuItems: MenuProps['items'] = [
 		{
-			key: '0',
-			icon: <BugFilled />,
-			label: 'Create Board',
-			onClick: () => openModal('Create board'),
-		},
-		{
-			key: '3',
+			key: '1',
 			label: 'Boards',
 			type: 'group',
-			children: columnStore.boards.map((board, index) => ({
+			children: boardStore.boards.map((board, index) => ({
 				key: `board-${index}`,
 				icon: <BugFilled />,
 				label: board.title,
@@ -64,7 +59,14 @@ export const SideBar = () => {
 					/>
 				</div>
 				<Divider style={{ margin: 0 }} />
-				<div className={`demo-logo-vertical`} />
+				<div>
+					<p>{userStore.user?.userName}</p>
+				</div>
+				<div>
+					<span onClick={() => openModal('Create board')}>
+						<p>Create Board</p> <PlusOutlined />
+					</span>
+				</div>
 				<Menu
 					className={`${st.menu}`}
 					theme='light'
@@ -88,4 +90,4 @@ export const SideBar = () => {
 			/>
 		</>
 	);
-};
+});

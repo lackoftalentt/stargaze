@@ -1,19 +1,21 @@
 import { DeleteOutlined, HighlightOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { observer } from 'mobx-react-lite';
-import columnStore, { ITask } from '../../stores/columnStore';
+import taskStore from '../../stores/taskStore';
+import { ITask } from '../../types/types';
 import s from './ColumnItem.module.scss';
 
 interface ColumnItemProps {
 	task: ITask;
 	columnId: string;
 	openModal: (taskId: string) => void;
+	boardId: string | undefined;
 }
 
 export const ColumnItem = observer(
-	({ task, columnId, openModal }: ColumnItemProps) => {
+	({ task, columnId, openModal, boardId }: ColumnItemProps) => {
 		const deleteTask = () => {
-			columnStore.deleteFromTask(task.id, columnId);
+			taskStore.deleteTask(task.id, columnId, boardId);
 		};
 
 		return (

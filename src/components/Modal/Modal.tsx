@@ -7,10 +7,9 @@ import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import cn from 'classnames';
-import { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import TurndownService from 'turndown';
-import columnStore from '../../stores/columnStore';
+import taskStore from '../../stores/taskStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './Modal.module.scss';
@@ -20,6 +19,7 @@ interface ModalProps {
 	columnId: string;
 	title: string;
 	taskId: string | undefined;
+	boardId: string | undefined;
 }
 
 export const Modal = ({
@@ -28,6 +28,7 @@ export const Modal = ({
 	columnId,
 	title,
 	taskId,
+	boardId,
 }: ModalProps) => {
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation();
@@ -36,7 +37,7 @@ export const Modal = ({
 
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
-		content: taskId ? '' : 'Task title here...',
+		content: 'Task title here...',
 		editorProps: {
 			attributes: {
 				class: `${s.editorTitle}`,
@@ -46,26 +47,13 @@ export const Modal = ({
 
 	const editorDesc = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
-		content: taskId ? '' : 'Task description here...',
-
+		content: 'Task description here...',
 		editorProps: {
 			attributes: {
 				class: ` ${s.editorDesc}`,
 			},
 		},
 	});
-
-	useEffect(() => {
-		if (taskId) {
-			const task = columnStore.columns
-				.find(column => column.id === columnId)
-				?.tasks.find(task => task.id === taskId);
-			if (task) {
-				editorTitle?.commands.setContent(task.title);
-				editorDesc?.commands.setContent(task.description);
-			}
-		}
-	}, [taskId, columnId]);
 
 	const turndownService = new TurndownService();
 
@@ -76,7 +64,12 @@ export const Modal = ({
 		const description = editorDesc?.getHTML() || '';
 		const markdownDescription = turndownService.turndown(description);
 
-		columnStore.addTaskToColumn(markdownTitle, markdownDescription, columnId);
+		taskStore.addTaskToColumn(
+			markdownTitle,
+			markdownDescription,
+			columnId,
+			boardId
+		);
 		closeModal();
 	};
 
@@ -87,7 +80,7 @@ export const Modal = ({
 		const newDescription = editorDesc?.getHTML() || '';
 		const markdownDesc = turndownService.turndown(newDescription);
 
-		columnStore.editTask(taskId, columnId, markdownTitle, markdownDesc);
+		taskStore.editTask(taskId, columnId, markdownTitle, markdownDesc, boardId);
 		closeModal();
 	};
 

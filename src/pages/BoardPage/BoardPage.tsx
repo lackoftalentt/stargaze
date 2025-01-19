@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Column } from '../../components/Column/Column';
 import { Modal4Column } from '../../components/Modal4Columns/SingleModal';
-import columnStore from '../../stores/columnStore';
+import boardStore from '../../stores/boardStore';
 import authStore from '../../stores/userStore';
 import s from './BoardPage.module.scss';
 
@@ -15,7 +15,7 @@ export const BoardPage = observer(() => {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [modalTitle, setModalTitle] = useState('');
-	const board = columnStore.getBoardById(id);
+	const board = boardStore.getBoardById(id);
 
 	const openModal = (title: string, boardId?: string) => {
 		setModalTitle(title);
@@ -38,18 +38,16 @@ export const BoardPage = observer(() => {
 			<main className={s.board}>
 				<div className={s.boardHeader}>
 					<h1 className={s.boardTitle}>{board?.title || 'Board Not Found'}</h1>
-					<div>
-						<PlusCircleTwoTone
-							onClick={() => openModal('Create column')}
-							size={20}
-							className={s.addColumnBtn}
-						/>
-						<EditFilled
-							onClick={() => openModal('Edit board', board?.id)}
-							size={20}
-							className={s.editBoardBtn}
-						/>
-					</div>
+					<PlusCircleTwoTone
+						onClick={() => openModal('Create column')}
+						size={20}
+						className={s.addColumnBtn}
+					/>
+					<EditFilled
+						onClick={() => openModal('Edit board', board?.id)}
+						size={20}
+						className={s.editBoardBtn}
+					/>
 				</div>
 				<div className={s.columnContainer}>
 					{board?.columns.map(column => (

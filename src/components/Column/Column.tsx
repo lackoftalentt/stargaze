@@ -1,7 +1,9 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import columnStore, { IColumn } from '../../stores/columnStore';
+import { useParams } from 'react-router';
+import columnStore from '../../stores/columnStore';
+import { IColumn } from '../../types/types';
 import { ColumnItem } from '../ColumnItem/ColumnItem';
 import { Modal } from '../Modal/Modal';
 import { Modal4Column } from '../Modal4Columns/SingleModal';
@@ -23,11 +25,12 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 	const closeModal = useCallback(() => setModalIsOpen(false), []);
 	const closeColModal = useCallback(() => setColModalIsOpen(false), []);
 
-	const column = columnStore.columns.find(col => col.id === columnId);
-	const tasks = column ? column.tasks : [];
+	const { id: boardId } = useParams<{ id: string }>();
+
+	const tasks = columnStore.getTasksForColumn(columnId);
 
 	const deleteColumn = useCallback(() => {
-		columnStore.deleteColumn(columnId);
+		columnStore.deleteColumn(columnId, boardId);
 	}, [columnId]);
 
 	const openTaskModal = (mode: string, id?: string) => {
@@ -60,6 +63,7 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 			<div className={s.taskContainer}>
 				{tasks.map(task => (
 					<ColumnItem
+						boardId={boardId}
 						key={task.id}
 						task={task}
 						columnId={columnId}
@@ -69,6 +73,7 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 			</div>
 			<Modal
 				taskId={taskId}
+				boardId={boardId}
 				title={modalMode === 'Create task' ? 'Create Task' : 'Edit Task'}
 				isOpen={modalIsOpen}
 				closeModal={closeModal}
@@ -77,6 +82,7 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 
 			<Modal4Column
 				columnId={columnId}
+				boardId={boardId}
 				title={colModalMode === 'Create task' ? 'Create column' : 'Edit column'}
 				isOpenCol={colModalIsOpen}
 				closeModalCol={closeColModal}

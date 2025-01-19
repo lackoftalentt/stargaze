@@ -8,6 +8,7 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import ReactDOM from 'react-dom';
 import TurndownService from 'turndown';
+import boardStore from '../../stores/boardStore';
 import columnStore from '../../stores/columnStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
@@ -18,7 +19,7 @@ interface ModalProps {
 	isOpenCol: boolean;
 	title: string;
 	columnId?: string | undefined;
-	boardId?: string;
+	boardId?: string | undefined;
 }
 
 export const Modal4Column = ({
@@ -45,28 +46,28 @@ export const Modal4Column = ({
 	const createColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
-		columnStore.createColumn(markdownTitle);
+		columnStore.createColumn(markdownTitle, boardId);
 		closeModalCol();
 	};
 
 	const createBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
-		columnStore.createBoard(markdownTitle);
+		boardStore.createBoard(markdownTitle);
 		closeModalCol();
 	};
 
 	const editColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
-		columnStore.editColumn(columnId, markdownTitle);
+		columnStore.editColumn(columnId, markdownTitle, boardId);
 		closeModalCol();
 	};
 
 	const editBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
-		columnStore.editBoard(boardId, markdownTitle);
+		boardStore.editBoard(boardId, markdownTitle);
 		closeModalCol();
 	};
 
