@@ -1,9 +1,9 @@
 import { BugFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu, MenuProps } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import boardStore from '../../stores/boardStore';
+import modalStore from '../../stores/modalStore';
 import userStore from '../../stores/userStore';
 import { Modal4Column } from '../Modal4Columns/SingleModal';
 import { Button } from '../ui/Button/Button';
@@ -14,29 +14,20 @@ const { Sider } = Layout;
 
 export const SideBar = observer(() => {
 	const { removeUser } = userStore;
-	const isAuth = !!userStore.user?.token;
 	const navigate = useNavigate();
-
-	const [isOpen, setIsOpen] = useState(false);
-	const [modalTitle, setModalTitle] = useState('');
-
-	const openModal = (title: string) => {
-		setModalTitle(title);
-		setIsOpen(true);
-	};
-
-	const closeModal = () => setIsOpen(false);
 
 	const menuItems: MenuProps['items'] = [
 		{
 			key: '1',
 			label: 'Boards',
 			type: 'group',
-			children: boardStore.boards.map((board, index) => ({
-				key: `board-${index}`,
+			children: boardStore.boards.map(board => ({
+				key: board.id,
 				icon: <BugFilled />,
 				label: board.title,
-				onClick: () => navigate(`/board/${board.id}`),
+				onClick: () => {
+					navigate(`/board/${board.id}`);
+				},
 			})),
 		},
 	];
@@ -48,7 +39,7 @@ export const SideBar = observer(() => {
 				breakpoint='xxl'
 				theme='light'
 				collapsedWidth='0'
-				className={`${st.sidebar}`}
+				className={st.sidebar}
 			>
 				<div className={`${st.sidebarHeader}`}>
 					<img
@@ -59,12 +50,16 @@ export const SideBar = observer(() => {
 					/>
 				</div>
 				<Divider style={{ margin: 0 }} />
-				<div>
-					<p>{userStore.user?.userName}</p>
+				<div className={st.huesos}>
+					<p className={st.nickname}>{userStore.user?.userName}</p>
+					<LogoutOutlined onClick={() => removeUser()} />
 				</div>
-				<div>
-					<span onClick={() => openModal('Create board')}>
-						<p>Create Board</p> <PlusOutlined />
+				<Divider style={{ margin: 0 }} />
+				<div className={st.createBoard}>
+					<span onClick={() => modalStore.openColumnModal('Create board')}>
+						<Button className={st.createBoardBtn}>
+							Create Board <PlusOutlined />
+						</Button>
 					</span>
 				</div>
 				<Menu
@@ -74,20 +69,9 @@ export const SideBar = observer(() => {
 					defaultSelectedKeys={['1']}
 					items={menuItems}
 				/>
-				{isAuth && (
-					<div className={st.sidebarFooter}>
-						<Button className={st.sidebarButton} onClick={() => removeUser()}>
-							logout <LogoutOutlined />
-						</Button>
-					</div>
-				)}
 			</Sider>
 
-			<Modal4Column
-				title={modalTitle}
-				closeModalCol={closeModal}
-				isOpenCol={isOpen}
-			/>
+			<Modal4Column title={modalStore.colModalMode} />
 		</>
 	);
 });

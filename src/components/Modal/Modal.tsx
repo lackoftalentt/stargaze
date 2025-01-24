@@ -9,30 +9,22 @@ import StarterKit from '@tiptap/starter-kit';
 import cn from 'classnames';
 import ReactDOM from 'react-dom';
 import TurndownService from 'turndown';
+import modalStore from '../../stores/modalStore';
 import taskStore from '../../stores/taskStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './Modal.module.scss';
 interface ModalProps {
-	isOpen: boolean;
-	closeModal: () => void;
 	columnId: string;
 	title: string;
-	taskId: string | undefined;
-	boardId: string | undefined;
+	taskId?: string | undefined;
+	boardId?: string | undefined;
 }
 
-export const Modal = ({
-	isOpen,
-	closeModal,
-	columnId,
-	title,
-	taskId,
-	boardId,
-}: ModalProps) => {
+export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation();
-		closeModal();
+		modalStore.closeTaskModal();
 	};
 
 	const editorTitle = useEditor({
@@ -70,7 +62,7 @@ export const Modal = ({
 			columnId,
 			boardId
 		);
-		closeModal();
+		modalStore.closeTaskModal();
 	};
 
 	const handleEditTask = () => {
@@ -81,16 +73,19 @@ export const Modal = ({
 		const markdownDesc = turndownService.turndown(newDescription);
 
 		taskStore.editTask(taskId, columnId, markdownTitle, markdownDesc, boardId);
-		closeModal();
+		modalStore.closeTaskModal();
 	};
 
-	if (!isOpen) return null;
+	if (!modalStore.modalIsOpen) return null;
 	return ReactDOM.createPortal(
 		<div className={s.modalBg} onClick={handleContentClick}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
 					<h1 className={s.modalTitle}>{title}</h1>
-					<CloseOutlined className={s.closeModalBtn} onClick={closeModal} />
+					<CloseOutlined
+						className={s.closeModalBtn}
+						onClick={modalStore.closeTaskModal}
+					/>
 				</div>
 				<div className={s.taskTitle}>
 					<label htmlFor='Sex'>Task title</label>

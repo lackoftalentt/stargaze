@@ -1,6 +1,7 @@
 .column {
 	display: flex;
 	flex-direction: column;
+	min-height: 250px;
 	position: relative;
 	max-width: 400px;
 	background: hsl(218deg 50% 91%);

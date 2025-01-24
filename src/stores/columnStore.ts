@@ -1,11 +1,11 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, toJS } from 'mobx';
 import { v4 as uuidv4 } from 'uuid';
 import { IColumn, ITask } from '../types/types';
 import boardStore from './boardStore';
 
 class ColumnStore {
 	constructor() {
-		makeAutoObservable(this);
+		makeAutoObservable(this, {}, { deep: true });
 	}
 
 	getColumnById(columnId: string | undefined): IColumn | undefined {
@@ -31,10 +31,15 @@ class ColumnStore {
 	}
 
 	deleteColumn(columnId: string, boardId: string | undefined) {
+		console.log('Board ID before calling deleteColumn:', boardId);
 		const board = boardStore.getBoardById(boardId);
-		if (board) {
-			board.columns = board.columns.filter(column => column.id !== columnId);
+		if (!board) {
+			console.log('Board not found for deleteColumn. boardId:', boardId);
+			return;
 		}
+
+		board.columns = board.columns.filter(column => column.id !== columnId);
+		console.log('Column deleted. Remaining columns:', toJS(board.columns));
 	}
 
 	editColumn(
@@ -43,13 +48,19 @@ class ColumnStore {
 		boardId: string | undefined
 	) {
 		const board = boardStore.getBoardById(boardId);
-		if (board) {
-			const column = board.columns.find(column => column.id === columnId);
-			if (column) {
-				column.title = newTitle;
-				console.log(newTitle)
-			}
+		if (!board) {
+			console.log('Board not found for editColumn. boardId:', boardId);
+			return;
 		}
+
+		const column = board.columns.find(column => column.id === columnId);
+		if (!column) {
+			console.log('Column not found for edit. columnId:', columnId);
+			return;
+		}
+
+		column.title = newTitle;
+		console.log('Updated column title:', column.title);
 	}
 
 	getTasksForColumn(columnId: string): ITask[] {

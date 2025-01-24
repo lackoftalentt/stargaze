@@ -6,30 +6,23 @@ import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { observer } from 'mobx-react-lite';
 import ReactDOM from 'react-dom';
+import { useParams } from 'react-router';
 import TurndownService from 'turndown';
 import boardStore from '../../stores/boardStore';
 import columnStore from '../../stores/columnStore';
+import modalStore from '../../stores/modalStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './SingleModal.module.scss';
 
 interface ModalProps {
-	closeModalCol: () => void;
-	isOpenCol: boolean;
 	title: string;
 	columnId?: string | undefined;
-	boardId?: string | undefined;
 }
 
-export const Modal4Column = ({
-	isOpenCol,
-	closeModalCol,
-	title,
-	columnId,
-	boardId,
-}: ModalProps) => {
-	// const navigate = useNavigate();
+export const Modal4Column = observer(({ title, columnId }: ModalProps) => {
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
 		content: 'Title...',
@@ -41,84 +34,70 @@ export const Modal4Column = ({
 		},
 	});
 
+	const { id: boardId } = useParams();
+
 	const turndownService = new TurndownService();
 
 	const createColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		columnStore.createColumn(markdownTitle, boardId);
-		closeModalCol();
+		modalStore.closeColumnModal();
 	};
 
 	const createBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		boardStore.createBoard(markdownTitle);
-		closeModalCol();
+		modalStore.closeColumnModal();
 	};
 
 	const editColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		columnStore.editColumn(columnId, markdownTitle, boardId);
-		closeModalCol();
+		modalStore.closeColumnModal();
 	};
 
 	const editBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		boardStore.editBoard(boardId, markdownTitle);
-		closeModalCol();
+		modalStore.closeColumnModal();
 	};
 
-	if (!isOpenCol) return null;
+	const actions: Record<string, (() => void) | undefined> = {
+		'Edit column': editColumnHandler,
+		'Create column': createColumnHandler,
+		'Create board': createBoardHandler,
+		'Edit board': editBoardHandler,
+	};
+
+	const handleClick = actions[title];
+
+	if (!modalStore.colModalIsOpen) return null;
 
 	return ReactDOM.createPortal(
-		<div className={s.modalBg} onClick={closeModalCol}>
+		<div className={s.modalBg} onClick={modalStore.closeColumnModal}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
 					<h1 className={s.modalTitle}>{title}</h1>
-					<CloseOutlined className={s.closeModalBtn} onClick={closeModalCol} />
+					<CloseOutlined
+						className={s.closeModalBtn}
+						onClick={modalStore.closeColumnModal}
+					/>
 				</div>
 				<div className={s.taskTitle}>
 					<label htmlFor='taskTitle'>{title}</label>
 					<TextEditor editor={editorTitle} />
 				</div>
 				<div className={s.buttonWrapper}>
-					{title === 'Edit column' ? (
-						<Button
-							className={s.modalButton}
-							onClick={() => editColumnHandler()}
-						>
-							Edit column
-						</Button>
-					) : title === 'Create column' ? (
-						<Button
-							className={s.modalButton}
-							onClick={() => createColumnHandler()}
-						>
-							Create column
-						</Button>
-					) : title === 'Create board' ? (
-						<Button
-							className={s.modalButton}
-							onClick={() => createBoardHandler()}
-						>
-							Create board
-						</Button>
-					) : (
-						boardId && (
-							<Button
-								className={s.modalButton}
-								onClick={() => editBoardHandler()}
-							>
-								Edit board
-							</Button>
-						)
-					)}
+					<Button className={s.modalButton} onClick={handleClick}>
+						{title}
+					</Button>
 				</div>
 			</div>
 		</div>,
 		document.body
 	);
-};
+});

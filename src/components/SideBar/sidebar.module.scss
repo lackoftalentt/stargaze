@@ -1,10 +1,30 @@
 .sidebar {
-	height: 100vh;
+	// height: 100vh;
 	&Header {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		height: 105px;
+	}
+	.huesos {
+		margin: 10px 20px;
+		display: flex;
+		justify-content: space-between;
+	}
+	.createBoard {
+		margin: 10px;
+		&Btn {
+			width: 100%;
+			background: white;
+			color: hsl(233deg 36% 38%);
+			padding: 5px;
+			border-radius: 2px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 15px;
+			cursor: pointer;
+		}
 	}
 	&Logo {
 		width: 250px;
@@ -12,14 +32,9 @@
 	}
 	.menu {
 		margin-top: 20px;
-		height: 690px;
+		height: 678px;
 	}
-	&Footer{
-		display: flex;
-		justify-content: center;
-		align-items: end;
-	}
-	&Button{
+	&Button {
 		width: 250px;
 	}
 }

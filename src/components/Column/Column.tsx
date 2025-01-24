@@ -1,9 +1,9 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { useParams } from 'react-router';
 import columnStore from '../../stores/columnStore';
-import { IColumn } from '../../types/types';
+import modalStore from '../../stores/modalStore';
 import { ColumnItem } from '../ColumnItem/ColumnItem';
 import { Modal } from '../Modal/Modal';
 import { Modal4Column } from '../Modal4Columns/SingleModal';
@@ -12,36 +12,15 @@ import s from './Column.module.scss';
 interface ColumnProps {
 	title?: string;
 	columnId: string;
-	column?: IColumn;
 }
 
 export const Column = observer(({ title, columnId }: ColumnProps) => {
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [colModalIsOpen, setColModalIsOpen] = useState(false);
-	const [taskId, setTaskId] = useState<string | undefined>('');
-	const [modalMode, setModalMode] = useState<string>('Create');
-	const [colModalMode, setColModalMode] = useState<string>('Create');
-
-	const closeModal = useCallback(() => setModalIsOpen(false), []);
-	const closeColModal = useCallback(() => setColModalIsOpen(false), []);
-
 	const { id: boardId } = useParams<{ id: string }>();
 
 	const tasks = columnStore.getTasksForColumn(columnId);
 
-	const deleteColumn = useCallback(() => {
+	const deleteColumn = () => {
 		columnStore.deleteColumn(columnId, boardId);
-	}, [columnId]);
-
-	const openTaskModal = (mode: string, id?: string) => {
-		setTaskId(id);
-		setModalMode(mode);
-		setModalIsOpen(true);
-	};
-
-	const openColumnModal = (mode: string) => {
-		setColModalMode(mode);
-		setColModalIsOpen(true);
 	};
 
 	return (
@@ -50,43 +29,64 @@ export const Column = observer(({ title, columnId }: ColumnProps) => {
 				<h2 className={s.columnTitle}>{title}</h2>
 				<div className={s.columnActionsBtn}>
 					<PlusOutlined
-						onClick={() => openTaskModal('Create task')}
+						onClick={() => modalStore.openTaskModal('Create task')}
 						className={s.addTaskBtn}
 					/>
 					<EditOutlined
-						onClick={() => openColumnModal('Edit column')}
+						onClick={() => modalStore.openColumnModal('Edit column')}
 						className={s.editBtn}
 					/>
 					<DeleteOutlined onClick={deleteColumn} className={s.deleteBtn} />
 				</div>
 			</div>
 			<div className={s.taskContainer}>
-				{tasks.map(task => (
-					<ColumnItem
-						boardId={boardId}
-						key={task.id}
-						task={task}
-						columnId={columnId}
-						openModal={() => openTaskModal('Edit', task.id)}
-					/>
-				))}
+				<Droppable droppableId={columnId} type='TASK'>
+					{provided => (
+						<div
+							ref={provided.innerRef}
+							{...provided.droppableProps}
+							className={s.droppableContainer}
+						>
+							{tasks.map((task, index) => (
+								<Draggable key={task.id} draggableId={task.id} index={index}>
+									{provided => (
+										<div
+											ref={provided.innerRef}
+											{...provided.draggableProps}
+											{...provided.dragHandleProps}
+										>
+											<ColumnItem
+												boardId={boardId}
+												task={task}
+												columnId={columnId}
+												openModal={() =>
+													modalStore.openTaskModal('Edit', task.id)
+												}
+											/>
+										</div>
+									)}
+								</Draggable>
+							))}
+							{provided.placeholder}
+						</div>
+					)}
+				</Droppable>
 			</div>
-			<Modal
-				taskId={taskId}
-				boardId={boardId}
-				title={modalMode === 'Create task' ? 'Create Task' : 'Edit Task'}
-				isOpen={modalIsOpen}
-				closeModal={closeModal}
-				columnId={columnId}
-			/>
 
-			<Modal4Column
-				columnId={columnId}
-				boardId={boardId}
-				title={colModalMode === 'Create task' ? 'Create column' : 'Edit column'}
-				isOpenCol={colModalIsOpen}
-				closeModalCol={closeColModal}
-			/>
+			{modalStore.modalIsOpen && (
+				<Modal
+					taskId={modalStore.taskId}
+					boardId={boardId}
+					title={
+						modalStore.modalMode === 'Create task' ? 'Create Task' : 'Edit Task'
+					}
+					columnId={columnId}
+				/>
+			)}
+
+			{modalStore.colModalIsOpen && (
+				<Modal4Column columnId={columnId} title={modalStore.colModalMode} />
+			)}
 		</div>
 	);
 });
