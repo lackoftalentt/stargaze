@@ -1,9 +1,9 @@
 import { BugFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu, MenuProps } from 'antd';
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import boardStore from '../../stores/boardStore';
-import modalStore from '../../stores/modalStore';
 import userStore from '../../stores/userStore';
 import { Modal4Column } from '../Modal4Columns/SingleModal';
 import { Button } from '../ui/Button/Button';
@@ -13,8 +13,26 @@ import logo from '/src/assets/images/logo.png';
 const { Sider } = Layout;
 
 export const SideBar = observer(() => {
+	// Локальные стейты для управления модалками
+	const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+	const [selectedColumnId, setSelectedColumnId] = useState<string | undefined>(
+		undefined
+	);
+
 	const { removeUser } = userStore;
 	const navigate = useNavigate();
+
+	// Открытие модалки для создания доски
+	const openColumnModal = () => {
+		setIsColumnModalOpen(true);
+		setSelectedColumnId('newColumnId'); // Если нужно, замените на логику получения ID
+	};
+
+	// Закрытие модалки
+	const closeColumnModal = () => {
+		setIsColumnModalOpen(false);
+		setSelectedColumnId(undefined);
+	};
 
 	const menuItems: MenuProps['items'] = [
 		{
@@ -36,7 +54,7 @@ export const SideBar = observer(() => {
 		<>
 			<Sider
 				width={300}
-				breakpoint='xxl'
+				breakpoint='lg'
 				theme='light'
 				collapsedWidth='0'
 				className={st.sidebar}
@@ -56,7 +74,7 @@ export const SideBar = observer(() => {
 				</div>
 				<Divider style={{ margin: 0 }} />
 				<div className={st.createBoard}>
-					<span onClick={() => modalStore.openColumnModal('Create board')}>
+					<span onClick={openColumnModal}>
 						<Button className={st.createBoardBtn}>
 							Create Board <PlusOutlined />
 						</Button>
@@ -71,7 +89,14 @@ export const SideBar = observer(() => {
 				/>
 			</Sider>
 
-			<Modal4Column title={modalStore.colModalMode} />
+			{isColumnModalOpen && (
+				<Modal4Column
+					title={'Create board'}
+					isOpen={isColumnModalOpen}
+					onClose={closeColumnModal}
+					columnId={selectedColumnId}
+				/>
+			)}
 		</>
 	);
 });

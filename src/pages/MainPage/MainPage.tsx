@@ -1,10 +1,29 @@
 import { PlusOutlined } from '@ant-design/icons';
+import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import { Modal4Column } from '../../components/Modal4Columns/SingleModal';
 import { Button } from '../../components/ui/Button/Button';
-import modalStore from '../../stores/modalStore';
 import s from './MainPage.module.scss';
 
-export const MainPage = () => {
+export const MainPage = observer(() => {
+	// Локальные стейты для управления модалками
+	const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+
+	// ID для передачи в модалку (если нужно, можно использовать конкретное значение или логику для его получения)
+	const [selectedColumnId, setSelectedColumnId] = useState<string | undefined>(undefined);
+
+	// Открытие модалки для создания проекта
+	const openColumnModal = () => {
+		setIsColumnModalOpen(true);
+		setSelectedColumnId('newColumnId'); // Здесь можете задать свой ID для колонки
+	};
+
+	// Закрытие модалки
+	const closeColumnModal = () => {
+		setIsColumnModalOpen(false);
+		setSelectedColumnId(undefined);
+	};
+
 	return (
 		<>
 			<main className={s.mainPage}>
@@ -28,15 +47,23 @@ export const MainPage = () => {
 						into clarity? Try Stargaze today! 🚀
 					</p>
 					<Button
-						onClick={() => modalStore.openColumnModal('Create board')}
+						onClick={openColumnModal}
 						className={s.button}
 					>
-						Create Project <PlusOutlined />{' '}
+						Create Project <PlusOutlined />
 					</Button>
 				</div>
 			</main>
 
-			<Modal4Column title={modalStore.colModalMode} />
+			{/* Модалка для создания проекта */}
+			{isColumnModalOpen && (
+				<Modal4Column
+					title={'Create board'}
+					isOpen={isColumnModalOpen}
+					onClose={closeColumnModal}
+					columnId={selectedColumnId}
+				/>
+			)}
 		</>
 	);
-};
+});

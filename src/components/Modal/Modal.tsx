@@ -8,24 +8,34 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import cn from 'classnames';
 import ReactDOM from 'react-dom';
+import { useParams } from 'react-router';
 import TurndownService from 'turndown';
-import modalStore from '../../stores/modalStore';
 import taskStore from '../../stores/taskStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './Modal.module.scss';
+
 interface ModalProps {
-	columnId: string;
 	title: string;
+	isOpen: boolean;
+	onClose: () => void;
+	columnId: string | undefined;
 	taskId?: string | undefined;
-	boardId?: string | undefined;
 }
 
-export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
+export const Modal = ({
+	title,
+	columnId,
+	taskId,
+	onClose,
+	isOpen,
+}: ModalProps) => {
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation();
-		modalStore.closeTaskModal();
+		() => onClose()
 	};
+
+	const { id: boardId } = useParams<{ id: string }>();
 
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
@@ -62,7 +72,7 @@ export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
 			columnId,
 			boardId
 		);
-		modalStore.closeTaskModal();
+		() => onClose();
 	};
 
 	const handleEditTask = () => {
@@ -73,10 +83,10 @@ export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
 		const markdownDesc = turndownService.turndown(newDescription);
 
 		taskStore.editTask(taskId, columnId, markdownTitle, markdownDesc, boardId);
-		modalStore.closeTaskModal();
+		() => onClose();
 	};
 
-	if (!modalStore.modalIsOpen) return null;
+	if (!isOpen) return null;
 	return ReactDOM.createPortal(
 		<div className={s.modalBg} onClick={handleContentClick}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
@@ -84,15 +94,13 @@ export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
 					<h1 className={s.modalTitle}>{title}</h1>
 					<CloseOutlined
 						className={s.closeModalBtn}
-						onClick={modalStore.closeTaskModal}
+						onClick={() => onClose()}
 					/>
 				</div>
 				<div className={s.taskTitle}>
 					<label htmlFor='Sex'>Task title</label>
 					<div className={s.inputWrapper}>
-						<div>
-							<TextEditor className={s.titleEditor} editor={editorTitle} />
-						</div>
+						<TextEditor className={s.titleEditor} editor={editorTitle} />
 					</div>
 				</div>
 				<div className={s.taskDesc}>
@@ -103,11 +111,11 @@ export const Modal = ({ columnId, title, taskId, boardId }: ModalProps) => {
 				</div>
 				<div className={s.buttonWrapper}>
 					{taskId ? (
-						<Button className={s.modalButton} onClick={() => handleEditTask()}>
+						<Button className={s.modalButton} onClick={handleEditTask}>
 							Edit task
 						</Button>
 					) : (
-						<Button className={s.modalButton} onClick={() => handleAddTask()}>
+						<Button className={s.modalButton} onClick={handleAddTask}>
 							Create task
 						</Button>
 					)}

@@ -6,23 +6,23 @@ import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { observer } from 'mobx-react-lite';
 import ReactDOM from 'react-dom';
 import { useParams } from 'react-router';
 import TurndownService from 'turndown';
 import boardStore from '../../stores/boardStore';
 import columnStore from '../../stores/columnStore';
-import modalStore from '../../stores/modalStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './SingleModal.module.scss';
 
 interface ModalProps {
 	title: string;
-	columnId?: string | undefined;
+	isOpen: boolean;
+	onClose: () => void;
+	columnId: string | undefined
 }
 
-export const Modal4Column = observer(({ title, columnId }: ModalProps) => {
+export const Modal4Column = ({ title, isOpen, onClose, columnId }: ModalProps) => {
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
 		content: 'Title...',
@@ -42,28 +42,28 @@ export const Modal4Column = observer(({ title, columnId }: ModalProps) => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		columnStore.createColumn(markdownTitle, boardId);
-		modalStore.closeColumnModal();
+		onClose();
 	};
 
 	const createBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		boardStore.createBoard(markdownTitle);
-		modalStore.closeColumnModal();
+		onClose();
 	};
 
 	const editColumnHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		columnStore.editColumn(columnId, markdownTitle, boardId);
-		modalStore.closeColumnModal();
+		onClose();
 	};
 
 	const editBoardHandler = () => {
 		const title = editorTitle?.getHTML() || '';
 		const markdownTitle = turndownService.turndown(title);
 		boardStore.editBoard(boardId, markdownTitle);
-		modalStore.closeColumnModal();
+		onClose();
 	};
 
 	const actions: Record<string, (() => void) | undefined> = {
@@ -75,16 +75,16 @@ export const Modal4Column = observer(({ title, columnId }: ModalProps) => {
 
 	const handleClick = actions[title];
 
-	if (!modalStore.colModalIsOpen) return null;
+	if (!isOpen) return null;
 
 	return ReactDOM.createPortal(
-		<div className={s.modalBg} onClick={modalStore.closeColumnModal}>
+		<div className={s.modalBg} onClick={onClose}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
 					<h1 className={s.modalTitle}>{title}</h1>
 					<CloseOutlined
 						className={s.closeModalBtn}
-						onClick={modalStore.closeColumnModal}
+						onClick={onClose}
 					/>
 				</div>
 				<div className={s.taskTitle}>
@@ -100,4 +100,4 @@ export const Modal4Column = observer(({ title, columnId }: ModalProps) => {
 		</div>,
 		document.body
 	);
-});
+};
