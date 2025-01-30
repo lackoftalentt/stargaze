@@ -1,7 +1,7 @@
 import { DeleteOutlined, HighlightOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import modalStore from '../../stores/modalStore';
 import taskStore from '../../stores/taskStore';
 import { ITask } from '../../types/types';
 import { Modal } from '../Modal/Modal';
@@ -15,14 +15,10 @@ interface ColumnItemProps {
 
 export const ColumnItem = observer(
 	({ task, columnId, boardId }: ColumnItemProps) => {
-		const [modalIsOpen, setModalIsOpen] = useState(false);
-
-		const openEditModal = () => {
-			setModalIsOpen(true);
-		};
-
-		const closeEditModal = () => {
-			setModalIsOpen(false);
+		const editTaskHandle = (taskId: string | undefined) => {
+			modalStore.modalMode = 'Edit task';
+			taskStore.taskId = taskId;
+			modalStore.openTaskModal();
 		};
 
 		return (
@@ -41,21 +37,16 @@ export const ColumnItem = observer(
 					>
 						Delete <DeleteOutlined />
 					</button>
-					<button onClick={openEditModal} className={s.cardButtons}>
+					<button
+						onClick={() => editTaskHandle(task.id)}
+						className={s.cardButtons}
+					>
 						Edit <HighlightOutlined />
 					</button>
 					<section>Priority</section>
 				</div>
 
-				{modalIsOpen && (
-					<Modal
-						isOpen={modalIsOpen}
-						title={'Edit task'}
-						taskId={task.id}
-						columnId={columnId}
-						onClose={closeEditModal}
-					/>
-				)}
+				{modalStore.taskModalIsOpen && <Modal />}
 			</div>
 		);
 	}

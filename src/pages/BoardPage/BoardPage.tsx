@@ -1,23 +1,21 @@
 import { DeleteOutlined, EditFilled, PlusOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useNavigate, useParams } from 'react-router';
 import { Column } from '../../components/Column/Column';
-import { Modal4Column } from '../../components/Modal4Columns/SingleModal';
+import { SingleModal } from '../../components/Modal4Columns/SingleModal';
 import boardStore from '../../stores/boardStore';
+import modalStore from '../../stores/modalStore';
 import authStore from '../../stores/userStore';
 import s from './BoardPage.module.scss';
 
-export const BoardPage = () => {
+export const BoardPage = observer(() => {
 	const isAuth = authStore.user?.token;
 	const navigate = useNavigate();
 	const { id: boardId } = useParams<{ id: string }>();
 
 	const board = boardStore.getBoardById(boardId);
-
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [modalMode, setModalMode] = useState('');
-	const [selectedColumnId, setSelectedColumnId] = useState('');
 
 	const deleteBoardHandle = () => {
 		boardStore.deleteBoard(boardId);
@@ -26,7 +24,6 @@ export const BoardPage = () => {
 
 	const onDragEnd = (result: DropResult) => {
 		const { source, destination } = result;
-
 		if (
 			!destination ||
 			(source.droppableId === destination.droppableId &&
@@ -57,7 +54,6 @@ export const BoardPage = () => {
 			const tasks = Array.from(sourceColumn.tasks);
 			const [movedTask] = tasks.splice(source.index, 1);
 			tasks.splice(destination.index, 0, movedTask);
-
 			boardStore.updateColumnTasks(sourceColumn.id, tasks);
 		} else {
 			const sourceTasks = Array.from(sourceColumn.tasks);
@@ -71,23 +67,25 @@ export const BoardPage = () => {
 		}
 	};
 
+	const addColumnHandle = () => {
+		modalStore.modalMode = 'Create column';
+		modalStore.openSingleModal();
+	};
+
+	const editBoardHandle = () => {
+		modalStore.modalMode = 'Edit board';
+		modalStore.openSingleModal();
+	};
+
 	useEffect(() => {
 		if (!isAuth) {
 			navigate('/login');
 		}
 	}, [isAuth]);
 
-	const openModal = (mode: string, columnId: string = '') => {
-		setIsModalOpen(true);
-		setModalMode(mode);
-		setSelectedColumnId(columnId);
-	};
-
-	const closeModal = () => {
-		setIsModalOpen(false);
-		setModalMode('');
-		setSelectedColumnId('');
-	};
+	if (!board) {
+		return <div>Board Not Found</div>;
+	}
 
 	return (
 		<>
@@ -97,13 +95,15 @@ export const BoardPage = () => {
 						<h1 className={s.boardTitle}>
 							{board?.title || 'Board Not Found'}
 						</h1>
-						<PlusOutlined
-							onClick={() => openModal('Create column')}
-							size={20}
-							className={s.addColumnBtn}
-						/>
+						{board?.columns.length < 4 && (
+							<PlusOutlined
+								onClick={addColumnHandle}
+								size={20}
+								className={s.addColumnBtn}
+							/>
+						)}
 						<EditFilled
-							onClick={() => openModal('Edit board')}
+							onClick={editBoardHandle}
 							size={20}
 							className={s.editBoardBtn}
 						/>
@@ -114,24 +114,21 @@ export const BoardPage = () => {
 						/>
 					</div>
 					<div className={s.columnContainer}>
-						{board?.columns?.map(column => (
-							<Column
-								key={column.id}
-								title={column.title}
-								columnId={column.id}
-							/>
-						))}
+						{board?.columns?.length === 0 ? (
+							<div>Нет колонок</div>
+						) : (
+							board?.columns?.map(column => (
+								<Column
+									key={column.id}
+									title={column.title}
+									columnId={column.id}
+								/>
+							))
+						)}
 					</div>
 				</main>
 			</DragDropContext>
-			{isModalOpen && (
-				<Modal4Column
-					isOpen={isModalOpen}
-					title={modalMode}
-					columnId={selectedColumnId}
-					onClose={closeModal}
-				/>
-			)}
+			{modalStore.singleModalIsOpen && <SingleModal />}
 		</>
 	);
-};
+});

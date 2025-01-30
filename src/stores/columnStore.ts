@@ -4,6 +4,8 @@ import { IColumn, ITask } from '../types/types';
 import boardStore from './boardStore';
 
 class ColumnStore {
+	columnId: string | undefined = undefined;
+
 	constructor() {
 		makeAutoObservable(this, {}, { deep: true });
 	}

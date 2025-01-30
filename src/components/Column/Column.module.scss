@@ -2,15 +2,28 @@
 	display: flex;
 	flex-direction: column;
 	min-height: 250px;
+	max-height: 600px;
 	position: relative;
 	max-width: 400px;
 	background: hsl(218deg 50% 91%);
 	border-radius: 10px;
 	padding: 20px;
 	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+	overflow: auto;
 	&Title {
 		font-size: 24px;
 		color: hsl(233, 60%, 44%);
+	}
+	&::-webkit-scrollbar {
+		width: 3px;
+	}
+	&::-webkit-scrollbar-thumb {
+		background: #676565;
+		border-radius: 20px;
+		width: 3px;
+	}
+	.emptyState {
+		color: hsl(218deg 50% 91%);
 	}
 	&Header {
 		display: flex;

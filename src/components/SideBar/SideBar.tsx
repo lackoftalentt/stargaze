@@ -1,11 +1,11 @@
 import { BugFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
 import { Divider, Layout, Menu, MenuProps } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import boardStore from '../../stores/boardStore';
+import modalStore from '../../stores/modalStore';
 import userStore from '../../stores/userStore';
-import { Modal4Column } from '../Modal4Columns/SingleModal';
+import { SingleModal } from '../Modal4Columns/SingleModal';
 import { Button } from '../ui/Button/Button';
 import st from './sidebar.module.scss';
 import logo from '/src/assets/images/logo.png';
@@ -13,25 +13,12 @@ import logo from '/src/assets/images/logo.png';
 const { Sider } = Layout;
 
 export const SideBar = observer(() => {
-	// Локальные стейты для управления модалками
-	const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
-	const [selectedColumnId, setSelectedColumnId] = useState<string | undefined>(
-		undefined
-	);
-
 	const { removeUser } = userStore;
 	const navigate = useNavigate();
 
-	// Открытие модалки для создания доски
-	const openColumnModal = () => {
-		setIsColumnModalOpen(true);
-		setSelectedColumnId('newColumnId'); // Если нужно, замените на логику получения ID
-	};
-
-	// Закрытие модалки
-	const closeColumnModal = () => {
-		setIsColumnModalOpen(false);
-		setSelectedColumnId(undefined);
+	const addBoardHandler = () => {
+		modalStore.modalMode = 'Create board';
+		modalStore.openSingleModal();
 	};
 
 	const menuItems: MenuProps['items'] = [
@@ -74,7 +61,7 @@ export const SideBar = observer(() => {
 				</div>
 				<Divider style={{ margin: 0 }} />
 				<div className={st.createBoard}>
-					<span onClick={openColumnModal}>
+					<span onClick={() => addBoardHandler()}>
 						<Button className={st.createBoardBtn}>
 							Create Board <PlusOutlined />
 						</Button>
@@ -89,14 +76,7 @@ export const SideBar = observer(() => {
 				/>
 			</Sider>
 
-			{isColumnModalOpen && (
-				<Modal4Column
-					title={'Create board'}
-					isOpen={isColumnModalOpen}
-					onClose={closeColumnModal}
-					columnId={selectedColumnId}
-				/>
-			)}
+			{modalStore.singleModalIsOpen && <SingleModal />}
 		</>
 	);
 });

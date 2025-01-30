@@ -4,6 +4,7 @@ import { ITask } from '../types/types';
 import boardStore from './boardStore';
 
 class TaskStore {
+	taskId: string | undefined = undefined;
 	constructor() {
 		makeAutoObservable(this);
 	}

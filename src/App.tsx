@@ -21,6 +21,7 @@ const App: React.FC = () => {
 							minHeight: '100%',
 							background: colorBgContainer,
 							borderRadius: borderRadiusLG,
+							overflowX: 'auto'
 						}}
 					>
 						<Outlet />

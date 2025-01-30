@@ -10,32 +10,23 @@ import cn from 'classnames';
 import ReactDOM from 'react-dom';
 import { useParams } from 'react-router';
 import TurndownService from 'turndown';
+import columnStore from '../../stores/columnStore';
+import modalStore from '../../stores/modalStore';
 import taskStore from '../../stores/taskStore';
 import { TextEditor } from '../TextEditor/TextEditor';
 import { Button } from '../ui/Button/Button';
 import s from './Modal.module.scss';
 
-interface ModalProps {
-	title: string;
-	isOpen: boolean;
-	onClose: () => void;
-	columnId: string | undefined;
-	taskId?: string | undefined;
-}
-
-export const Modal = ({
-	title,
-	columnId,
-	taskId,
-	onClose,
-	isOpen,
-}: ModalProps) => {
+export const Modal = () => {
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation();
-		() => onClose()
+		modalStore.closeTaskModal();
 	};
 
 	const { id: boardId } = useParams<{ id: string }>();
+	const columnId = columnStore.columnId;
+	const taskId = taskStore.taskId;
+	const title = modalStore.modalMode;
 
 	const editorTitle = useEditor({
 		extensions: [StarterKit, Bold, Italic, Underline, Strike, Link],
@@ -72,7 +63,8 @@ export const Modal = ({
 			columnId,
 			boardId
 		);
-		() => onClose();
+
+		modalStore.closeTaskModal();
 	};
 
 	const handleEditTask = () => {
@@ -83,19 +75,17 @@ export const Modal = ({
 		const markdownDesc = turndownService.turndown(newDescription);
 
 		taskStore.editTask(taskId, columnId, markdownTitle, markdownDesc, boardId);
-		() => onClose();
+
+		modalStore.closeTaskModal();
 	};
 
-	if (!isOpen) return null;
+	if (!modalStore.taskModalIsOpen) return null;
 	return ReactDOM.createPortal(
 		<div className={s.modalBg} onClick={handleContentClick}>
 			<div className={s.modal} onClick={e => e.stopPropagation()}>
 				<div className={s.modalHeader}>
 					<h1 className={s.modalTitle}>{title}</h1>
-					<CloseOutlined
-						className={s.closeModalBtn}
-						onClick={() => onClose()}
-					/>
+					<CloseOutlined className={s.closeModalBtn} onClick={() => {}} />
 				</div>
 				<div className={s.taskTitle}>
 					<label htmlFor='Sex'>Task title</label>
@@ -110,7 +100,7 @@ export const Modal = ({
 					</div>
 				</div>
 				<div className={s.buttonWrapper}>
-					{taskId ? (
+					{title === 'Edit task' ? (
 						<Button className={s.modalButton} onClick={handleEditTask}>
 							Edit task
 						</Button>

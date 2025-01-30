@@ -5,7 +5,7 @@
 		// justify-content: center;
 		gap: 15px;
 		margin-bottom: 20px;
-		div{
+		div {
 			display: flex;
 			gap: 10px;
 		}
@@ -17,5 +17,8 @@
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		gap: 30px;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		white-space: nowrap;
 	}
 }

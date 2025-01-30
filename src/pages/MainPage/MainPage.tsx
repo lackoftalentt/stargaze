@@ -1,29 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
-import { Modal4Column } from '../../components/Modal4Columns/SingleModal';
+import { SingleModal } from '../../components/Modal4Columns/SingleModal';
 import { Button } from '../../components/ui/Button/Button';
+import modalStore from '../../stores/modalStore';
 import s from './MainPage.module.scss';
 
 export const MainPage = observer(() => {
-	// Локальные стейты для управления модалками
-	const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
-
-	// ID для передачи в модалку (если нужно, можно использовать конкретное значение или логику для его получения)
-	const [selectedColumnId, setSelectedColumnId] = useState<string | undefined>(undefined);
-
-	// Открытие модалки для создания проекта
-	const openColumnModal = () => {
-		setIsColumnModalOpen(true);
-		setSelectedColumnId('newColumnId'); // Здесь можете задать свой ID для колонки
+	const addBoardHandler = () => {
+		modalStore.modalMode = 'Create board';
+		modalStore.openSingleModal();
 	};
-
-	// Закрытие модалки
-	const closeColumnModal = () => {
-		setIsColumnModalOpen(false);
-		setSelectedColumnId(undefined);
-	};
-
 	return (
 		<>
 			<main className={s.mainPage}>
@@ -46,24 +32,13 @@ export const MainPage = observer(() => {
 						take control of your time like never before. Ready to turn chaos
 						into clarity? Try Stargaze today! 🚀
 					</p>
-					<Button
-						onClick={openColumnModal}
-						className={s.button}
-					>
+					<Button onClick={() => addBoardHandler()} className={s.button}>
 						Create Project <PlusOutlined />
 					</Button>
 				</div>
 			</main>
 
-			{/* Модалка для создания проекта */}
-			{isColumnModalOpen && (
-				<Modal4Column
-					title={'Create board'}
-					isOpen={isColumnModalOpen}
-					onClose={closeColumnModal}
-					columnId={selectedColumnId}
-				/>
-			)}
+			{modalStore.singleModalIsOpen && <SingleModal />}
 		</>
 	);
 });
